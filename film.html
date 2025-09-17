@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>film</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%; height: 100%;
+      background-color: #1A1511;
+      font-family: 'Manrope', sans-serif;
+      overflow: hidden;
+      color: white;
+    }
+
+    /* 🎬 세로로 갈라지는 검정 커버 */
+    .screen-cover {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      pointer-events: none;
+    }
+
+    .cover {
+      width: 100vw;
+      height: 50vh;
+      background-color: #000;
+      transition: transform 1s ease-in-out;
+    }
+
+    .cover.top { transform: translateY(0%); }
+    .cover.bottom { transform: translateY(0%); }
+
+    #bg-blur {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background-size: cover;
+      background-position: center;
+      filter: blur(10px) brightness(0.5);
+      z-index: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .top-right {
+      position: fixed;
+      top: 25px; right: 40px;
+      display: flex;
+      gap: 30px;
+      font-size: 15px;
+      font-weight: 500;
+      z-index: 300;
+    }
+
+    .top-right a {
+      text-decoration: none;
+      color: white;
+      transition: opacity 0.2s;
+    }
+    .top-right a:hover { opacity: 0.5; }
+
+    .center-border {
+      position: fixed;
+      left: 50%; top: 50%;
+      width: min(360px, 30vw);
+      height: min(360px, 30vw);
+      transform: translate(-50%, -50%);
+      border: 1px solid white;
+      z-index: 100;
+      pointer-events: none;
+    }
+
+    
+
+    .masked-image-wrapper {
+      position: absolute;
+      top: 50%; left: 0;
+      transform: translateY(-50%);
+      display: flex;
+      gap: min(120px, 8vw);
+      z-index: 80;
+      transition: transform 0.2s ease;
+    }
+
+    .masked-image {
+      width: min(362px, 30vw);
+      height: min(362px, 30vw);
+      background-size: cover;
+      background-position: center;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .overlay {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .label {
+      font-size: 18px;
+      font-weight: 600;
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .masked-image.ep1 { background-image: url('photo/ep1.jpg'); }
+    .masked-image.ep2 { background-image: url('photo/ep2.jpg'); }
+    .masked-image.ep3 { background-image: url('photo/ep3.jpg'); }
+    .masked-image.ep4 { background-image: url('photo/ep4.jpg'); }
+    .masked-image.ep5 { background-image: url('photo/ep5.jpg'); }
+
+    .ruler-wrapper {
+      position: fixed;
+      bottom: 0;
+      width: 100vw;
+      height: 100px;
+      z-index: 150;
+      cursor: grab;
+    }
+
+    .ruler {
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-start;
+      padding-left: 0;
+      padding-bottom: 0;
+      transition: transform 0.3s ease;
+    }
+
+    .ruler-marker {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .ruler-line {
+      width: 2px;
+      height: min(50px, 5vw);
+      background: white;
+    }
+
+    .tick-group {
+      display: flex;
+      gap: 28px;
+      margin: 0 30px;
+    }
+
+    .ruler-tick {
+      width: 1px;
+      height: min(20px, 2vw);
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    .drag-hint {
+      position: fixed;
+      font-size: 15px;
+      color: white;
+      z-index: 160;
+      pointer-events: none;
+      display: none;
+    }
+
+    @keyframes slideLeft {
+      from { transform: translateX(0px); opacity: 0.6; }
+      to   { transform: translateX(-80px); opacity: 1; }
+    }
+
+    /* =========================
+       ▼▼ 추가: TIMELOG & MENU UI
+       (기존 코드는 변경하지 않고, 아래 스타일을 “추가”만 함)
+       ========================= */
+
+    /* 상단 좌측 TIMEL0G 버튼 */
+    .tl-timelog-btn{
+      position: fixed;
+      top: 25px;
+      left: 40px;
+      font-size: 25px;
+      font-weight: 550;
+      cursor: pointer;
+      z-index: 3005;
+      transition: opacity .2s ease;
+
+  /* ✅ 핵심: 완전 흰색 + difference로 자동 반전 */
+  color: #fff;
+  mix-blend-mode: difference;
+
+  /* 배경-클립, 투명 텍스트 제거 (회색화 원인) */
+  background: none;
+  -webkit-background-clip: initial;
+  background-clip: initial;
+    }
+    .tl-timelog-btn:hover{ opacity:.6; }
+
+   /* ▶ 메뉴 버튼(두 줄 → X) 위치/크기 복구 */
+/* 버튼은 계속 고정 위치 */
+.tl-menu-btn{
+  position: fixed;     /* ← 이거 유지 */
+  top: 25px;
+  right: 40px;
+  width: 36px;
+  height: 36px;
+  z-index: 3006;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  /* position: relative;  ← 넣지 마세요! */
+}
+
+/* 막대 기본 상태(두 줄) */
+.tl-menu-btn .bar{
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 26px; height: 2.5px;
+  background: #fff; /* 닫힌 상태: 어두운 배경에서 보이게 흰색 */
+  transform: translate(-50%, -50%) rotate(0deg);
+  transform-origin: center;
+  transition: transform .25s ease, opacity .2s ease, background-color .2s ease;
+}
+.tl-menu-btn .bar:nth-child(1){ transform: translate(-50%, calc(-50% - 6px)) rotate(0deg); }
+.tl-menu-btn .bar:nth-child(2){ transform: translate(-50%, calc(-50% + 6px)) rotate(0deg); }
+
+/* 열린 상태(X) 모양 + 색 반전(흰 패널 위에서 보이도록) */
+.tl-menu-btn.open .bar{
+  transform: translate(-50%, -50%);
+  background: #111; /* ← 여기 포인트! 흰 패널 위에서 또렷하게 */
+}
+.tl-menu-btn.open .bar:nth-child(1){ transform: translate(-50%, -50%) rotate(45deg); }
+.tl-menu-btn.open .bar:nth-child(2){ transform: translate(-50%, -50%) rotate(-45deg); }
+
+    /* 상단 패널 — 항상 화면의 절반(50vw) */
+.top-note-panel{
+  position: fixed;
+  top: 0; right: 0;
+  width: 60vw; 
+  height: 100vh;
+  background: #fff; color: #111;
+  box-shadow: 0 16px 40px rgba(0,0,0,.35);
+  border-radius: 0;
+  padding: 50px 22px;
+  z-index: 3004;
+  display: none; 
+  overflow: auto;
+  animation: noteSlide .25s ease;
+}
+.top-note-panel.show{ display: block; }
+
+@keyframes noteSlide{
+  from{ transform: translateY(-8px); opacity:0; }
+  to  { transform: translateY(0);    opacity:1; }
+}
+
+    .top-note-panel .note-title{
+      font-weight: 600; font-size: 25px; margin: 0 0 10px 20px; color:#000;
+    }
+    .top-note-panel .note-body{ font-size: 15px; line-height: 1.65; }
+
+    .top-note-panel .menu-links{
+      display:flex; flex-direction:column; gap:23px;
+      font-size:20px; margin: 100px 0 0 20px; color:#545454;
+    }
+    .top-note-panel .menu-item{ cursor:pointer; transition: opacity .2s; }
+    .top-note-panel .menu-item:hover{ opacity:.6; }
+    .top-note-panel .menu-divider{ height:1px; background: rgba(0,0,0,.2); }
+
+    /* 전역 유틸: 상단 UI 숨김 */
+    .ui-hide{ display: none !important; }
+
+    /* ▼ 추가: 스크롤 유도 문구 */
+/* ▼ 교체: 스크롤 유도 문구 스타일 */
+.scroll-prompt{
+  position: fixed;
+  left: 50%;
+  top: clamp(40px, 24vh, 220px);                /* 중앙보다 위로 */
+  transform: translateX(-50%); /* Y는 그대로 두고 X만 중앙 정렬 */
+  z-index: 200;              /* 이미지(80), 보더(100)보다 위 */
+  color: #fff;
+  font-weight: 400;          /* 얇게 */
+  font-size: clamp(16px, 2.05vmin, 26px);/* 더 작게 */
+  letter-spacing: .04em;
+  pointer-events: none;
+  text-align: center;
+  opacity: .95;
+  /* 대소문자 유지: text-transform 사용하지 않음 */
+  animation: scrollBlink 1.1s steps(2, jump-none) infinite; /* 깜빡임 유지 */
+}
+
+@keyframes scrollBlink{
+  0%,49% { opacity: .95; }
+  50%,100%{ opacity: 0; }
+}
+
+.scroll-prompt.hide{
+  opacity: 0;
+  animation: none;
+  transition: opacity .25s ease;
+}
+
+
+
+  </style>
+</head>
+<body>
+  <!-- 🎬 세로로 갈라지며 열리는 커버 -->
+  <div class="screen-cover">
+    <div class="cover top"></div>
+    <div class="cover bottom"></div>
+  </div>
+
+  <div id="bg-blur"></div>
+
+  <div class="center-border"></div>
+  <div class="scroll-prompt" id="scrollPrompt">Please Scroll!</div>
+  <div class="masked-image-wrapper" id="imageWrapper">
+    <div class="masked-image ep1">
+      <div class="overlay"><div class="label">The technique of<br>photographing a person</div></div>
+    </div>
+    <div class="masked-image ep2">
+      <!-- ✅ 두번째 텍스트: Cut Technique -->
+      <div class="overlay"><div class="label">Cut Technique</div></div>
+    </div>
+    <div class="masked-image ep3">
+      <!-- ✅ 세번째 텍스트: Photographic Composition -->
+      <div class="overlay"><div class="label">Photographic Composition</div></div>
+    </div>
+    <div class="masked-image ep4">
+      <!-- ✅ 네번째 텍스트: Light Technique -->
+      <div class="overlay"><div class="label">Light Technique</div></div>
+    </div>
+    <div class="masked-image ep5">
+      <!-- ✅ 다섯번째 텍스트: Color Grading -->
+      <div class="overlay"><div class="label">Color Grading</div></div>
+    </div>
+  </div>
+
+  <div class="ruler-wrapper" id="rulerWrapper">
+    <div class="ruler" id="ruler">
+      <div class="ruler-marker"><span>01</span><div class="ruler-line"></div></div>
+      <div class="tick-group" id="ticks1"></div>
+      <div class="ruler-marker"><span>02</span><div class="ruler-line"></div></div>
+      <div class="tick-group" id="ticks2"></div>
+      <div class="ruler-marker"><span>03</span><div class="ruler-line"></div></div>
+      <div class="tick-group" id="ticks3"></div>
+      <div class="ruler-marker"><span>04</span><div class="ruler-line"></div></div>
+      <div class="tick-group" id="ticks4"></div>
+      <div class="ruler-marker"><span>05</span><div class="ruler-line"></div></div>
+    </div>
+  </div>
+
+  <div class="drag-hint" id="dragHint">SCROLL</div>
+
+  <!-- =========================
+       ▼▼ 추가: TIMELOG 버튼 & 메뉴 토글/패널
+       ========================= -->
+  <div class="tl-timelog-btn" id="timelogBtn">TIMELOG</div>
+
+  <!-- 오른쪽 상단 두 줄(메뉴) 버튼 -->
+  <button class="tl-menu-btn" id="menuBtn" aria-label="Open note" aria-expanded="false">
+    <span class="bar"></span>
+    <span class="bar"></span>
+  </button>
+
+  <!-- 상단 네모 패널 -->
+  <div class="top-note-panel" id="topNote">
+    <div class="note-title">MENU</div>
+    <div class="note-body">
+      <div class="menu-links">
+        <div class="menu-item" data-target="home">Home</div>
+        <div class="menu-item" data-target="menu">Menu</div>
+        <div class="menu-divider"></div>
+        <div class="menu-item" data-target="index">Photographing a person</div>
+        <div class="menu-item" data-target="cut">Cut</div>
+        <div class="menu-item" data-target="frame">Composition</div>
+        <div class="menu-item" data-target="light">Light</div>
+        <div class="menu-item" data-target="color">Color</div>
+        <div class="menu-divider"></div>
+        <div class="menu-item" data-target="camera">Camera</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const imageWrapper = document.getElementById('imageWrapper');
+    const ruler = document.getElementById('ruler');
+    const bg = document.getElementById('bg-blur');
+    const images = document.querySelectorAll('.masked-image');
+    const dragHint = document.getElementById('dragHint');
+    const imageUrls = ['photo/ep1.jpg', 'photo/ep2.jpg', 'photo/ep3.jpg', 'photo/ep4.jpg', 'photo/ep5.jpg'];
+
+    let currentX = 0;
+    let markerToCenter = 0; // 첫 marker 중앙 offset
+    let isDragging = false;
+    let startX = 0;
+    let selectedIndex = 0;
+
+    const makeTicks = () => Array.from({ length: 15 }).map(() => '<div class="ruler-tick"></div>').join('');
+    document.getElementById('ticks1').innerHTML = makeTicks();
+    document.getElementById('ticks2').innerHTML = makeTicks();
+    document.getElementById('ticks3').innerHTML = makeTicks();
+    document.getElementById('ticks4').innerHTML = makeTicks();
+
+    function snapToClosest() {
+      const screenCenter = window.innerWidth / 2;
+      const centers = [...images].map(img => img.getBoundingClientRect().left + img.clientWidth / 2);
+      let closest = 0;
+      let minDiff = Infinity;
+
+      centers.forEach((c, i) => {
+        const diff = Math.abs(c - screenCenter);
+        if (diff < minDiff) {
+          minDiff = diff;
+          closest = i;
+        }
+      });
+
+      selectedIndex = closest;
+      const target = images[selectedIndex];
+      const targetRect = target.getBoundingClientRect();
+      const targetLeft = target.offsetLeft;
+      const targetWidth = target.offsetWidth;
+
+      // ✅ 절대 currentX 계산
+      currentX = screenCenter - (targetLeft + targetWidth / 2);
+
+      const translateValue = `translateX(${currentX}px)`;
+      imageWrapper.style.transform = `${translateValue} translateY(-50%)`;
+      ruler.style.transform = translateValue;
+      bg.style.backgroundImage = `url('${imageUrls[selectedIndex]}')`;
+    }
+
+    document.addEventListener('mousemove', (e) => {
+      const isOnRuler = e.clientY >= window.innerHeight - 100;
+      dragHint.style.display = isOnRuler ? 'block' : 'none';
+      dragHint.style.left = `${e.clientX + 10}px`;
+      dragHint.style.top = `${e.clientY + 10}px`;
+    });
+
+    images.forEach((img, i) => {
+      const overlay = img.querySelector('.overlay');
+      img.addEventListener('mouseenter', () => {
+        if (i === selectedIndex) overlay.style.display = 'flex';
+      });
+      img.addEventListener('mouseleave', () => {
+        overlay.style.display = 'none';
+      });
+      img.addEventListener('click', () => {
+        if (i === selectedIndex) {
+          // ✅ 각 이미지별 menu.html 내 섹션으로 이동
+          const urls = [
+            'menu.html#index-section',
+            'menu.html#cut-section',
+            'menu.html#composition-section',
+            'menu.html#light2-section',
+            'menu.html#color-section'
+          ];
+          window.location.href = urls[i];
+        }
+      });
+    });
+
+    window.addEventListener('resize', () => {
+      snapToClosest();
+    });
+
+    window.addEventListener('load', () => {
+      const screenCenter = window.innerWidth / 2;
+
+      // 첫번째 marker 중심 계산
+      const firstMarker = document.querySelector('.ruler-marker');
+      const markerRect = firstMarker.getBoundingClientRect();
+      const markerCenter = markerRect.left + markerRect.width / 2;
+
+      // ✅ marker를 중앙으로 옮기기 위한 offset 계산
+      markerToCenter = screenCenter - markerCenter;
+
+      // ✅ ruler 이동
+      ruler.style.transform = `translateX(${markerToCenter}px)`;
+
+      // 첫번째 이미지 중심 계산
+      const firstImage = images[0];
+      const imageRect = firstImage.getBoundingClientRect();
+      const imageCenter = imageRect.left + imageRect.width / 2;
+
+      // 이미지가 중앙에 오도록 이동량 계산
+      const imageToCenter = screenCenter - imageCenter;
+
+      // 이미지 wrapper 이동
+      imageWrapper.style.transform = `translateX(${imageToCenter}px) translateY(-50%)`;
+      currentX = imageToCenter;
+
+      // 배경 이미지 설정
+      bg.style.backgroundImage = `url('${imageUrls[0]}')`;
+      selectedIndex = 0;
+
+      // 🎬 커버 애니메이션 + 사운드
+      setTimeout(() => {
+        const clickSound = new Audio('sound/click2.WAV');
+        clickSound.volume = 0.3;
+        clickSound.play();
+        document.querySelector('.cover.top').style.transform = 'translateY(-100%)';
+        document.querySelector('.cover.bottom').style.transform = 'translateY(100%)';
+      }, 300);
+
+      setTimeout(() => {
+        document.querySelector('.screen-cover').style.display = 'none';
+      }, 1500);
+    });
+
+    let selectedMarkerIndex = 0; // 현재 중앙 marker index
+
+    window.addEventListener('wheel', (e) => {
+      e.preventDefault();
+
+      const markers = document.querySelectorAll('.ruler-marker');
+
+      // 스크롤 방향에 따른 index 변경
+      if (e.deltaY > 0 && selectedMarkerIndex < markers.length - 1) {
+        selectedMarkerIndex += 1;
+      } else if (e.deltaY < 0 && selectedMarkerIndex > 0) {
+        selectedMarkerIndex -= 1;
+      } else {
+        return; // 양끝이면 더 이상 진행하지 않음
+      }
+
+      // 선택된 marker 계산
+      const screenCenter = window.innerWidth / 2;
+      const selectedMarker = markers[selectedMarkerIndex];
+      const markerLeft = selectedMarker.offsetLeft;
+      const markerWidth = selectedMarker.offsetWidth;
+
+      // 현재 marker가 중앙에 오도록 이동량 계산
+      const markerToCenter = screenCenter - (markerLeft + markerWidth / 2);
+
+      // ✅ transform 적용: 눈금이 움직임
+      ruler.style.transform = `translateX(${markerToCenter}px)`;
+
+      // ✅ 이미지도 같은 방향으로 움직이게
+      selectedIndex = Math.min(Math.max(selectedMarkerIndex, 0), images.length - 1);
+      const target = images[selectedIndex];
+      const targetLeft = target.offsetLeft;
+      const targetWidth = target.offsetWidth;
+
+      currentX = screenCenter - (targetLeft + targetWidth / 2);
+      imageWrapper.style.transform = `translateX(${currentX}px) translateY(-50%)`;
+
+      // ✅ 배경 이미지 변경
+      bg.style.backgroundImage = `url('${imageUrls[selectedIndex]}')`;
+    }, { passive: false });
+  </script>
+
+  <!-- =========================
+       ▼▼ 추가: 메뉴/타임로그 스크립트
+       (원본 스크립트 아래에 “추가”)
+       ========================= -->
+  <script>
+    /* 공통 스크롤 헬퍼(같은 페이지 내 섹션으로 점프) */
+    function scrollToSection(el){
+      if(!el) return;
+      window.scrollTo({ top: el.offsetTop, behavior: 'auto' }); // 필요하면 'smooth'
+    }
+
+    /* ▶ TIMEL0G: index.html 로 이동 */
+    document.getElementById('timelogBtn')?.addEventListener('click', () => {
+      window.location.href = "index.html";
+    });
+
+    /* ▶ 메뉴 버튼 토글 */
+    (function(){
+      const btn  = document.getElementById('menuBtn');
+      const note = document.getElementById('topNote');
+      if(!btn || !note) return;
+
+      const openNote = () => {
+        btn.classList.add('open');
+        btn.setAttribute('aria-expanded','true');
+        note.classList.add('show');
+      };
+      const closeNote = () => {
+        btn.classList.remove('open');
+        btn.setAttribute('aria-expanded','false');
+        note.classList.remove('show');
+      };
+      const toggleNote = () => note.classList.contains('show') ? closeNote() : openNote();
+
+      btn.addEventListener('click', toggleNote);
+
+      // ESC 로 닫기
+      window.addEventListener('keydown', (e)=>{
+        if(e.key === 'Escape' && note.classList.contains('show')) closeNote();
+      });
+    })();
+
+ (function(){
+    const panel = document.getElementById('topNote');
+    const btn   = document.getElementById('menuBtn');
+    if(!panel) return;
+
+    function closeMenu(){
+      btn?.classList.remove('open');
+      btn?.setAttribute('aria-expanded','false');
+      panel?.classList.remove('show');
+    }
+
+    /* data-target → 목적지 매핑
+       - Home: index.html
+       - Menu: menu.html (최상단)
+       - index : menu.html#person-section
+       - cut   : menu.html#cut-section
+       - frame : menu.html#composition-section
+       - light : menu.html#light2-section   (이미지 클릭 라우팅과 동일하게 유지)
+       - color : menu.html#color-section
+       - camera: menu.html#camera-section   (요청대로)
+    */
+    const targetMap = {
+      home:  () => "index.html",
+      menu:  () => "menu.html",
+      index: () => "menu.html#index-section",
+      cut:   () => "menu.html#cut-section",
+      frame: () => "menu.html#composition-section",
+      light: () => "menu.html#light2-section",
+      color: () => "menu.html#color-section",
+      camera:() => "menu.html#camera-section"
+    };
+
+    document.querySelectorAll('.top-note-panel .menu-item').forEach(item=>{
+      item.addEventListener('click', ()=>{
+        const key = item.dataset.target;
+        const urlBuilder = targetMap[key];
+        if(urlBuilder){
+          window.location.href = urlBuilder();
+          closeMenu();
+        }
+      });
+    });
+  })();
+
+   (function(){
+    const prompt = document.getElementById('scrollPrompt');
+    if(!prompt) return;
+
+    const hide = () => prompt.classList.add('hide');
+
+    // 휠 스크롤(한 번만)
+    window.addEventListener('wheel', hide, { once: true, passive: false });
+
+    // 터치 시작(모바일/트랙패드 제스처)
+    window.addEventListener('touchstart', hide, { once: true });
+
+    // 키보드(스페이스/화살표/페이지/홈/엔드 등)
+    const keys = new Set(['ArrowDown','ArrowUp','PageDown','PageUp','Space','Home','End']);
+    const onKey = (e) => { if(keys.has(e.code) || keys.has(e.key)) hide(); };
+    window.addEventListener('keydown', onKey, { once: true });
+
+    // 필요 시: 이미지 클릭으로 섹션 이동도 유도 문구 숨김
+    document.getElementById('imageWrapper')?.addEventListener('click', hide, { once: true });
+  })();
+    
+  </script>
+</body>
+</html>

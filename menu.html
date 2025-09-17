@@ -1,0 +1,4609 @@
+<!DOCTYPE html>
+<html lang="ko" class="js">
+<head>
+  <meta charset="UTF-8" />
+  <title>Film Techniques</title>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Unna:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+ <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+ <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;800&display=swap" rel="stylesheet" />
+ <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600&display=swap" rel="stylesheet" />
+ <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet" />
+ <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500&display=swap" rel="stylesheet" />
+ <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet" />
+ <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&display=swap" rel="stylesheet" />
+ <link href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap" rel="stylesheet" />
+ <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@1,600&display=swap" rel="stylesheet" />
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+   html, body { color:#fff; }       /* 그대로 두고 */
+   .modal { color:#111; }           /* 모달 내부 기본 글자색 */
+   .modal-desc { color:#444; }      /* 이미 있음, 유지 */
+   .modal-title { color:#111; }     /* 제목 확실히 보이게 */
+
+
+    .unna-regular { font-family:"Unna", serif; font-weight:400; font-style:normal; }
+    .unna-bold { font-family:"Unna", serif; font-weight:700; font-style:normal; }
+    .unna-regular-italic { font-family:"Unna", serif; font-weight:400; font-style:italic; }
+    .unna-bold-italic { font-family:"Unna", serif; font-weight:700; font-style:italic; }
+
+
+/* index 섹션 */
+    .index-section {
+      width: 100vw;
+      height: 100vh;   /* 화면 한 화면 크기 */
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 영상 배경 */
+    .index-section video {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover; /* 비율 유지하면서 꽉 채우기 */
+      z-index: 1; /* 가장 뒤 */
+    }
+
+    /* 콘텐츠 (위에 올릴 글자 등) */
+    .index-content {
+      position: relative;
+      z-index: 2; /* 영상 위로 */
+      color: white;
+      font-size: 3rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+    }
+
+    /* index 타이틀 (Light 섹션의 .light-title와 동일 스타일) */
+.index-title {
+  position: absolute;
+  top: 48%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Manrope', sans-serif;
+  font-weight: 50;
+  font-size: 18px;
+  color: white;
+  z-index: 3;
+  text-align: center;
+  letter-spacing: 0.13em;
+  line-height: 3.5;
+}
+
+
+
+    /* 더 이상 안 쓰이므로 의미 없음 — 남아있어도 영향 X */
+.to-center { left: 50% !important; }
+.to-fullscreen {
+  width: 100vw !important;
+  height: 100vh !important;
+  aspect-ratio: auto;
+  border-radius: 0;
+  object-fit: cover;
+}
+
+
+    .video-subtitle {
+  display: inline-block;
+  font-size: 26px; /* 원하는 크기, 예: 26px */
+  font-weight: 50; /* 굵게 하고 싶다면 */
+}
+
+
+    .video-title.visible {
+      opacity: 1;
+    }
+
+    .after-section {
+      height: 100vh;
+      background-color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      color: black;
+      z-index: 3;
+      position: relative;
+    }
+
+    .after-content {
+      text-align: center;
+      font-weight: 500;
+    }
+
+.person-section {
+  display: flex;
+  position: relative;
+  background-color: white;
+  align-items: flex-start;
+  z-index: 0;
+  padding-bottom: 300px; /* ⬅ 높이 증가 */
+  padding-left: var(--person-left-w) !important;
+}
+
+ 
+
+
+
+
+/* ✅ 한 번에 조절 가능한 변수 */
+:root {
+  --shot-col-gap: 30px;   /* 가로 간격 */
+  --shot-row-gap: 200px;  /* 세로 간격 */
+  --shot-max-width: 300px;/* 이미지 최대 너비 */
+  --shot-caption-size: 18px;
+  --shot-zoom-scale: 1.12; /* 1.08~1.2 권장 */
+  --shot-min: 160px;   /* 카드 최소 폭 */
+  --shot-max: 320px;   /* 카드 최대 폭 */
+}
+
+.frame-scroll-right {
+  padding-top: 80px;
+  display: grid;
+
+  /* ✅ 가변 칼럼: 공간에 맞춰 1~N열 자동 */
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(clamp(var(--shot-min), 22vw, var(--shot-max)), 1fr)
+  );
+
+  column-gap: var(--shot-col-gap);
+  row-gap: var(--shot-row-gap);
+  margin-top: 150px;
+  margin-left: 80px;
+  position: relative;
+  z-index: 3;
+
+ 
+   width: var(--right-pane-width) !important; 
+
+  /* ✅ 셀을 가로로 꽉 채우도록 */
+  justify-items: stretch;
+  align-content: start;
+}
+
+
+.frame-scroll-right .grid-item{
+  position: relative;
+  width: 100%;           /* ✅ 셀 너비에 맞춤 */
+  max-width: var(--shot-max); /* (선택) 너무 커지지 않게 상한 */
+  aspect-ratio: 1 / 1;   /* 정사각형 유지 */
+  overflow: hidden;
+}
+
+
+/* 이미지: 박스 안에서만 움직임 */
+.frame-scroll-right .grid-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;                    /* 꽉 채우되 잘림 */
+  transition: transform 0.35s ease;
+  transform-origin: center center;
+}
+
+
+/* 캡션 공통 스타일 */
+.frame-scroll-right .grid-item .caption {
+  font-family: 'Manrope', sans-serif;
+  font-weight: 400;
+  font-size: var(--shot-caption-size);
+  margin-top: 8px;
+  text-align: left;
+}
+
+
+/* 호버 시 내부만 확대 */
+.frame-scroll-right .grid-item:hover img {
+  transform: scale(1.12);               /* 확대 비율 */
+}
+
+
+    .frame-photo {
+      width: 100%;
+      height: 500px;
+      background-color: #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: #333;
+      border-radius: 8px;
+      z-index: 3;
+    }
+
+/* 공통 타이틀 스타일 */
+.frame-title {
+  position: absolute;
+  top: 48%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Manrope', sans-serif;
+  font-weight: 50;
+  font-size: 18px;
+  color: white;
+  z-index: 3;
+  text-align: center;
+  letter-spacing: 0.13em;
+  line-height: 3.5;
+}
+
+
+
+
+
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal img {
+  max-width: 70vw;
+  max-height: 70vh;
+  object-fit: contain;
+  z-index: 2;
+  transform: scale(0.6);
+  opacity: 0;
+  animation: zoomIn 0.4s ease forwards;
+}
+
+@keyframes zoomIn {
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.modal-title {
+  font-family: 'Manrope', sans-serif;
+  font-weight: 600;
+  font-size: 22px;
+  margin-top: 20px;
+}
+
+.modal-desc {
+  font-size: 16px;
+  text-align: center;
+  color: #444;
+  margin-top: 10px;
+  white-space: pre-line;
+}
+
+.close-btn {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  font-size: 50px;
+  color: black;
+  cursor: pointer;
+  z-index: 4;
+}
+
+.nav {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 40px;
+  transform: translateY(-50%);
+  z-index: 3;
+}
+
+.arrow-btn {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.5);
+  border: 1.5px solid white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.arrow-icon {
+  width: 28px;   /* ✅ 기존 25 → 28로 확대 */
+  height: 28px;
+  stroke: white;
+  stroke-width: 2;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  display: block;
+}
+
+
+.floating-video.hidden,
+.index-text.hidden-hard,
+.video-title.hidden-hard {
+  display: none !important;
+}
+
+
+
+
+.light-section {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: black;
+  z-index: 2;
+}
+
+.light-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.light-title {
+  position: absolute;
+  top: 48%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Manrope', sans-serif;
+  font-weight: 50;
+  font-size: 18px;
+  color: white;
+  z-index: 3;
+  text-align: center;
+  letter-spacing: 0.13em;
+  line-height: 3.5;
+}
+
+
+.color-section {
+  transform: translateY(100px);
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2;
+  background-color:#000000;
+}
+
+.color-video {
+  width: 1065px;
+  height: 602px;
+  aspect-ratio: 16 / 9;
+  position: absolute;
+  top: 50%;  /* ⬅️ 정중앙으로 변경 */
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  object-fit: cover;
+}
+
+
+
+
+.color-nav {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1300px;/* ✅ 화살표 간격 넓히는 핵심 */
+  transform: translate(-50%, -50%);
+  display: flex;
+  justify-content: space-between;
+  z-index: 5;
+}
+
+.color-indicators {
+  position: absolute;
+  bottom: 195px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 12px;
+  z-index: 6;
+}
+
+.color-indicators .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #888;
+  transition: background-color 0.3s;
+}
+
+.color-indicators .dot.active {
+  background-color: white;
+}
+
+
+
+
+
+:root {
+     
+    --light2-video-max: 720px;      /* 오른쪽 영상 최대 가로폭 */
+    --light2-row-gap: 300px;        /* 카드 간 세로 간격 */
+    --light2-caption-size: 18px;    /* 캡션 폰트 크기 */
+  }
+
+  .light2-section {
+  display: flex;
+  position: relative;
+  background-color: #061425;
+  align-items: flex-start;
+  z-index: 0;
+  padding-left: var(--light2-left-w);   /* ← 40vw */
+  padding-bottom: 200px;
+}
+
+.light2-left-photo{
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: var(--light2-left-w);  /* = 40vw */
+  height: 100vh;
+  z-index: 1;
+  overflow: hidden;
+  transition: opacity .25s ease;
+}
+  .light2-left-photo.is-hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+  .light2-left-photo img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* 꽉 채움 */
+  display: block;
+}
+
+  .light2-right{
+  /* 영역 자체를 60%로 고정 */
+  width: var(--light2-right-w);          /* = 60vw */
+  position: relative;
+  z-index: 3;
+
+  /* 수직 간격/상단 여백 유지 */
+  padding-top: 80px;
+  margin-top: 240px;
+
+  /* 오른쪽 영역 안에서 "가운데 정렬" */
+  margin-left: auto;
+  margin-right: auto;                    /* ← 중앙 정렬 핵심 */
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--light2-row-gap);
+  align-items: center;                   /* ← 자식 카드들을 가운데 정렬 */
+}
+
+
+  .light2-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    max-width: var(--light2-video-max);
+  }
+
+  .light2-card video {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;  /* 가로로 길게 */
+    object-fit: cover;
+    display: block;
+  }
+
+  .light2-title {
+    margin-top: 24px;
+    font-weight: 600;
+    font-size: calc(var(--light2-caption-size) + 2px);
+    color: #fff;
+  }
+  .light2-desc {
+    margin-top: 12px;
+    font-size: var(--light2-caption-size);
+    color: #e7eaf3;
+    line-height: 1.5;
+    white-space: pre-line;
+  }
+
+ /* 카드엔 기준 주지 않음 (겹침 원인 제거) */
+.light2-card { position: static !important; }
+
+/* ▶︎ 비디오 래퍼: 버튼 기준이 되는 요소 */
+.light2-media {
+  position: relative;
+  width: 100%;
+  line-height: 0;        /* 인라인 미세 여백 제거 */
+}
+
+/* 비디오는 블록화해서 아래쪽 여백 제거 */
+.light2-media video {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* ▶︎ 작은 동그라미+삼각형, 래퍼 기준 정확히 중앙 */
+.light2-play-overlay {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.5);
+  border: 2px solid #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;           /* 영상 위, 제목/설명 아래로도 충분 */
+  cursor: pointer;
+}
+
+.light2-play-overlay .triangle {
+  width: 0; height: 0;
+  border-left: 14px solid #fff;     /* ▶︎ */
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  margin-left: 2px;
+}
+
+.light2-play-overlay.hidden { display: none; }
+
+.light2-play-overlay:hover {
+  transform: translate(-50%, -50%) scale(1.03);
+}
+
+
+/* ▷ 모달 컨텐츠 크기 더 작게 */
+.video-modal .vm-content {
+  position: relative;          /* 콘텐츠는 상대 위치 */
+  max-width: 60vw;             /* 기존 80 → 60 */
+  max-height: 60vh;            /* 기존 80 → 60 */
+}
+
+/* 비디오는 컨텐츠 박스 안에서만 맞춤 */
+.video-modal video {
+  width: 100%;
+  height: auto;
+  max-height: 60vh;
+  object-fit: contain;
+  display: block;
+  background: black;
+}
+
+/* ▷ X 버튼: 사진 모달과 동일한 위치(오버레이 기준) */
+.video-modal .vm-close {
+  position: absolute;          /* .video-modal(오버레이) 기준 */
+  top: 20px;                   /* 사진 모달과 동일 */
+  right: 30px;                 /* 사진 모달과 동일 */
+  font-size: 50px;             /* 사진 모달과 동일 */
+  line-height: 1;
+  color: #fff;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  z-index: 3001;               /* 비디오/컨텐츠 위로 확실히 */
+  pointer-events: auto;
+}
+
+/* 반응형(선택): 작은 화면에서 조금 더 줄이기 */
+@media (max-width: 900px) {
+  .video-modal .vm-content {
+    max-width: 86vw;
+    max-height: 50vh;
+  }
+  .video-modal video {
+    max-height: 50vh;
+  }
+}
+
+/* ✅ 비디오 모달 기본 오버레이 */
+.video-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.97);
+  display: none;                 /* 기본 숨김 */
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+/* ✅ visible일 때 보이기 */
+.video-modal.visible {
+  display: flex;
+}
+
+
+/* 비디오 모달 화살표 네비게이션 */
+#video-modal .nav {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 40px;
+  transform: translateY(-50%);
+  z-index: 3002; /* 닫기버튼보다 아래, 영상 위 */
+}
+
+/* ====== Frame 2 (가로 스크럽) ====== */
+.frame2-section{
+  position: relative;
+  width: 100vw;       /* ✅ 화면 폭에 맞춤 */
+  min-height: 100vh;  /* ✅ 화면 높이 이상 */
+  background:#1A1511; /* 원하면 기존 컬러 유지 */
+  z-index: 2;
+  overflow: hidden;   /* 트랙이 밖으로 튀지 않게 */
+}
+
+
+
+
+
+  /* 스코프: timelog-intro 내부만 영향 */
+  #timelog-intro, #timelog-intro * { box-sizing: border-box; }
+
+  #timelog-intro {
+    position: relative;
+    height: 100vh;           /* 한 화면 섹션 */
+    width: 100vw;
+    background-color: #1A1511;
+    overflow: hidden;        /* 섹션 내부만 숨김 */
+    font-family: 'Manrope', sans-serif;
+    color: #fff;
+    z-index: 100;            /* 페이지 최상단에 오도록 */
+  }
+
+  /* 상단/하단 UI들 (필요 시 노출용 – 원본 유지) */
+  #timelog-intro .tl-top-right {
+    position: fixed; top: 25px; right: 40px;
+    display: flex; gap: 30px; font-size: 15px; z-index: 20; font-weight: 500;
+  }
+  #timelog-intro .tl-top-right a { color: #fff; text-decoration: none; transition: opacity .2s; }
+  #timelog-intro .tl-top-right a:hover { opacity: .5; }
+
+  #timelog-intro .tl-sound-button {
+    position: fixed; bottom: 20px; right: 40px;
+    font-size: 15px; cursor: pointer; z-index: 20; font-weight: 500; display: none;
+  }
+
+  #timelog-intro .tl-pov-home {
+    position: fixed; top: 25px; left: 40px;
+    font-size: 25px; font-weight: 500; cursor: pointer; z-index: 30; transition: all .5s ease;
+  }
+
+  /* 네 귀퉁이 프레임 */
+  #timelog-intro .tl-video-corner {
+    position: fixed; width: 640px; height: 360px;
+    top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 3;
+  }
+  #timelog-intro .tl-corner {
+    position: absolute; width: 20px; height: 20px; border: 1px solid #fff; transition: all .5s ease;
+  }
+  #timelog-intro .tl-top-left     { top: 0; left: 0; border-right: none; border-bottom: none; }
+  #timelog-intro .tl-top-right-c  { top: 0; right: 0; border-left: none;  border-bottom: none; }
+  #timelog-intro .tl-bottom-left  { bottom: 0; left: 0; border-top: none; border-right: none; }
+  #timelog-intro .tl-bottom-right { bottom: 0; right: 0; border-left: none; border-top: none; }
+  #timelog-intro .tl-corner.expand.tl-top-left     { transform: translate(-250px, -100px); }
+  #timelog-intro .tl-corner.expand.tl-top-right-c  { transform: translate(250px, -100px); }
+  #timelog-intro .tl-corner.expand.tl-bottom-left  { transform: translate(-250px, 100px); }
+  #timelog-intro .tl-corner.expand.tl-bottom-right { transform: translate(250px, 100px); }
+
+  /* 비디오 박스 */
+  #timelog-intro .tl-video-wrapper{
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    transition: transform .4s ease; z-index: 3;
+  }
+  #timelog-intro .tl-video-wrapper.hovered { transform: translate(-50%, -50%) scale(1.03); }
+
+  #timelog-intro .tl-bg-video-container {
+    position: fixed; top: 50%; left: 50%;
+    width: 640px; height: 360px; transform: translate(-50%, -50%);
+    overflow: hidden; z-index: 2; transition: all 1s ease; cursor: pointer;
+  }
+  #timelog-intro .tl-bg-video-container.hovered { transform: translate(-50%, -50%) scale(1.03); }
+
+  #timelog-intro .tl-bg-video-container.active {
+    width: 100vw; height: 100vh; transform: translate(-50%, -50%);
+  }
+
+  #timelog-intro .tl-progress-bar-wrapper {
+    position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
+    width: 20%; height: 1px; background: rgba(255,255,255,.5); z-index: 25; display: none;
+  }
+  #timelog-intro .tl-progress-bar { height: 100%; background: #fff; width: 0%; }
+  #timelog-intro .tl-bg-video-container.active + .tl-progress-bar-wrapper { display: block; }
+
+  /* 패널/아이프레임(원본 구조 유지 – 필요 시 확장용) */
+  #timelog-intro .tl-film-panel {
+    position: fixed; top: 0; right: -100vw; width: 100vw; height: 100vh;
+    background: #1A1511; z-index: 100; transition: right .8s ease; overflow: hidden;
+  }
+  #timelog-intro .tl-film-panel.show { right: 0; }
+  #timelog-intro .tl-film-panel iframe { width: 100%; height: 100%; border: none; }
+
+  /* ON/OFF 토글 */
+  #timelog-intro .tl-onoff-toggle {
+    position: fixed; top: 25px; left: 50%; transform: translateX(-50%);
+    display: flex; align-items: center; font-size: 15px; font-weight: 500; z-index: 20;
+  }
+  #timelog-intro .tl-onoff-toggle .line {
+    width: 50px; height: 1px; background: #fff; margin: 0 5px; position: relative;
+  }
+  #timelog-intro .tl-onoff-toggle .circle{
+    width: 8px; height: 8px; border-radius: 50%; background: #fff; position: absolute; top: 50%;
+    transform: translateY(-50%); transition: left .5s ease;
+  }
+  #timelog-intro .tl-onoff-toggle.off .circle { left: 100%; transform: translate(-100%, -50%); }
+  #timelog-intro .tl-onoff-toggle.on  .circle { left: 0%;    transform: translate(0%, -50%); }
+
+  /* 오버레이 텍스트 래퍼 + (필요 시) 재생버튼 */
+  #timelog-intro .tl-video-overlay-texts {
+    position: fixed; inset: 0; pointer-events: none; z-index: 4;
+  }
+
+  /* 연도 라벨 */
+  #timelog-intro .tl-year-label {
+    position: fixed; bottom: 25px; left: 40px; font-size: 18px; font-weight: 500; z-index: 30; pointer-events: none;
+  }
+
+  /* 십자 조준선 (모바일/상황별) */
+  #timelog-intro .tl-crosshair { position: fixed; top: 50%; left: 50%; z-index: 180; pointer-events: none; }
+  #timelog-intro .tl-crosshair .line { position: absolute; background: #fff; }
+  #timelog-intro .tl-crosshair .vertical   { width: 1px; height: 30px; left: -0.5px; top: -15px; }
+  #timelog-intro .tl-crosshair .horizontal { width: 30px; height: 1px; left: -15px; top: -0.5px; }
+
+  /* 모바일(이미지) 백그라운드 */
+  #timelog-intro .tl-mobile-bg-image{
+    position: fixed; inset: 0; z-index: 0; overflow: hidden;
+  }
+  #timelog-intro .tl-mobile-bg-image img{
+    width: 100%; height: 100%; object-fit: cover; filter: grayscale(100%);
+  }
+
+  /* 커스텀 슬라이더 */
+  #timelog-intro .tl-custom-slider{
+    position: fixed; bottom: 140px; left: 50%; transform: translateX(-50%);
+    z-index: 20; width: 160px; height: 40px; display: flex; align-items: center; justify-content: center;
+  }
+  #timelog-intro .tl-slider-track{
+    position: relative; width: 140px; height: 36px; border-radius: 18px; background: transparent; border: 1px solid #fff;
+  }
+  #timelog-intro .tl-slider-thumb{
+    position: absolute; top: 50%; transform: translate(-50%, -50%);
+    width: 22px; height: 22px; border-radius: 50%; background: transparent; border: 1px solid #fff;
+    cursor: pointer; box-shadow: none; transition: border .2s ease; left: 15px;
+  }
+  #timelog-intro .tl-slider-thumb:hover{ box-shadow: 0 0 8px rgba(0,0,0,.4); }
+  #timelog-intro .tl-bg-video-container.active ~ .tl-custom-slider{ display: none; }
+
+  /* 흐림 오버레이 */
+  #timelog-intro .tl-blur-overlay{
+    position: fixed; inset: 0; backdrop-filter: blur(20px);
+    background: rgba(255,255,255,.1); z-index: 5; opacity: 1; pointer-events: none; transition: opacity .5s ease;
+  }
+  #timelog-intro .tl-blur-overlay.hide { opacity: 0; }
+
+  /* 가이드 화살표 */
+  #timelog-intro .tl-arrow-sequence{
+    position: absolute; top: 50%; left: 30px; transform: translateY(-50%);
+    display: flex; gap: 4px; pointer-events: none;
+  }
+  #timelog-intro .tl-arrow{
+    width: 28px; height: 28px; stroke: #fff; stroke-width: 1; fill: none; opacity: 0; animation: tlArrowBlink 1.5s infinite;
+  }
+  #timelog-intro .tl-arrow:nth-child(1){ animation-delay: 0s; }
+  #timelog-intro .tl-arrow:nth-child(2){ animation-delay: .3s; }
+  #timelog-intro .tl-arrow:nth-child(3){ animation-delay: .6s; }
+  @keyframes tlArrowBlink{
+    0%{opacity:0; transform: translateX(0);}
+    30%{opacity:1; transform: translateX(2px);}
+    60%{opacity:0; transform: translateX(4px);}
+    100%{opacity:0; transform: translateX(0);}
+  }
+  #timelog-intro .tl-arrow-sequence.hidden{ display: none !important; }
+
+  /* 슬라이더 라벨 */
+  #timelog-intro .tl-slider-label{
+    position: fixed; bottom: 110px; left: 50%; transform: translateX(-50%);
+    font-size: 12px; z-index: 20; pointer-events: none; opacity: .8;
+  }
+
+  /* 상태 클래스 */
+  #timelog-intro .tl-hidden{ display: none !important; }
+
+  /* 비디오 */
+  #timelog-intro .tl-bg-video{ width: 100%; height: 100%; object-fit: cover; transition: filter .2s ease; }
+
+
+/* ▼ 추가 */
+.person-section .frame-scroll-right .grid-item .caption {
+  display: none !important;
+}
+
+.person-section .frame-scroll-right .grid-item{
+  max-width: none !important;
+}
+
+
+/* ▼ 새 캡션 바 스타일 (오른쪽 영역 하단 고정 느낌) */
+.person-section .frame-caption-bar {
+  position: sticky;            /* 섹션 스크롤 따라오게 */
+  top: calc(100vh - 110px);    /* 화면 하단 근처에 붙도록 */
+  margin-left: 80px;           /* 기존 오른쪽 영역과 라인 맞춤 */
+  padding: 14px 12px;
+  font-family: 'Manrope', sans-serif;
+  font-weight: 500;
+  font-size: 18px;
+  color: #111;
+  background: rgba(255,255,255,0.9);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(0,0,0,0.08);
+  z-index: 4;
+  width: calc(100vw - var(--person-left-w)) !important;
+}
+
+
+/* ✅ person 섹션: 카드 래퍼 + 가운데 라벨 */
+
+
+/* ✅ person 오른쪽: 2열 고정 + 중앙정렬 */
+/* ✅ person 오른쪽: 2열 고정 + 확실한 간격 + 중앙정렬 (충돌 제거판) */
+.person-section .frame-scroll-right{
+  width: var(--right-pane-width) !important;  /* 오른쪽 60% */
+  margin: 150px auto 0;                       /* 중앙 정렬 */
+  padding-top: 80px;
+
+  display: grid;
+  /* 카드 폭은 '예전 크기' 느낌 유지: 280~320px 사이에서 고정처럼 보이도록 */
+  grid-template-columns: repeat(2, minmax(280px, var(--shot-max))) !important;
+
+  /* 🔥 간격을 명시적으로 크게 + 강제 덮어쓰기 */
+  column-gap: 84px !important;        /* ← 여기 숫자만 올리면 더 넓어짐 (예: 96px) */
+  row-gap: var(--shot-row-gap) !important;
+
+  justify-content: center;            /* 트랙 중앙 */
+  justify-items: stretch;
+
+  /* ⛔ 꼭 제거(아래 3번에서 설명): max-width 제한은 두지 않음 */
+}
+
+
+
+.person-section .frame-scroll-right .grid-card{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;                 /* ✅ 셀 너비에 맞춤 */
+  max-width: var(--shot-max);  /* (선택) 상한 */
+}
+.person-section .frame-scroll-right .grid-card .grid-item{
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+}
+
+.person-section .frame-scroll-right .grid-card .grid-item{
+  position: relative;
+  width: 100% !important;  
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+}
+
+.person-section .frame-scroll-right .grid-card .grid-item img{
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform .35s ease;
+  transform-origin: center center;
+}
+
+.person-section .frame-scroll-right .grid-card .grid-item:hover img{
+  transform: scale(var(--shot-zoom-scale));
+}
+
+/* 새 라벨(가운데 정렬, 이미지 아래) */
+.person-section .frame-scroll-right .label{
+  margin-top: 20px;
+  font-family: 'Manrope', sans-serif;
+  font-weight: 500;
+  font-size: var(--shot-caption-size);
+  line-height: 1.35;
+  color: #111;
+  text-align: center;           /* ⬅ 가운데 정렬 */
+  width: 100%;
+}
+
+/* (선택) 예전 .caption은 혹시 남아있어도 전부 숨김 */
+.person-section .frame-scroll-right .caption{ display:none !important; }
+
+
+
+
+
+/* ▶ 상단 왼쪽 Timelog 버튼 */
+.tl-timelog-btn{
+  position: fixed;
+  top: 25px;
+  left: 40px;
+  font-size: 25px;
+  font-weight: 500;
+  cursor: pointer;
+  z-index: 3005;
+  transition: opacity .2s ease;
+
+  /* ✅ 핵심: 완전 흰색 + difference로 자동 반전 */
+  color: #fff;
+  mix-blend-mode: difference;
+
+  /* 배경-클립, 투명 텍스트 제거 (회색화 원인) */
+  background: none;
+  -webkit-background-clip: initial;
+  background-clip: initial;
+}
+.tl-timelog-btn:hover{ opacity: .6; }
+
+
+/* ▶ 메뉴 버튼: '두 줄 상태(= .open 없음)'일 때 difference로 자동 반전 */
+.tl-menu-btn {
+  position: fixed;
+  top: 28px;
+  right: 40px;
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  z-index: 9999; /* 영상보다 위 */
+  background: transparent;
+  border: 0;
+  isolation: isolate;
+  mix-blend-mode: difference;
+}
+
+
+/* 두 줄 상태에서만 배경과 반전 */
+.tl-menu-btn:not(.open){
+  mix-blend-mode: difference;
+}
+
+
+
+.tl-menu-btn .bar{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 26px;
+  height: 2.5px;
+  background: #fff;                   /* 반드시 '흰색' + difference */
+  transform: translate(-50%, -50%) rotate(0deg);
+  transform-origin: center center;
+  transition: transform .25s ease, opacity .2s ease;
+}
+
+/* 닫힌 상태(두 줄): 살짝 위/아래로만 분리 */
+.tl-menu-btn .bar:nth-child(1){
+  transform: translate(-50%, calc(-50% - 6px)) rotate(0deg);
+}
+.tl-menu-btn .bar:nth-child(2){
+  transform: translate(-50%, calc(-50% + 6px)) rotate(0deg);
+}
+
+/* 열린 상태(X): 중앙 교차 */
+.tl-menu-btn.open .bar:nth-child(1){
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+.tl-menu-btn.open .bar:nth-child(2){
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+
+/* ── 상단 네모 패널 ──
+   - 오른쪽 영역(= 100vw - 700px)의 '반' 너비
+   - 모서리 각짐(= border-radius 0)
+   - 검정 배경, 흰 글자
+   - 화면 맨 위에 붙음
+*/
+
+
+/* ── 상단 네모 패널 (오른쪽 슬라이드) ── */
+.top-note-panel{
+  position: fixed;
+  inset: 0 0 0 auto;                 /* top/right/bottom 고정, left는 자동 */
+  width: 60vw; /* 화면의 '반' 기준 + 최소/최대 가드 */
+  
+  /* 세로는 항상 화면 가득 */
+  height: 100vh;                     
+  min-height: 100dvh;                /* 모바일 주소창 변동 대응 */
+
+  background: #ffffff;
+  color: #000;
+  box-shadow: 0 16px 40px rgba(0,0,0,.35);
+  border-radius: 0;
+
+  /* 내부 스크롤 & 튐 방지 */
+  overflow: auto;
+  overscroll-behavior: contain;
+
+  /* 안전영역 패딩(iOS 노치/홈바) */
+  padding: 50px 22px calc(22px + env(safe-area-inset-bottom));
+
+  z-index: 3004;
+
+  /* 초기 상태: 화면 밖(오른쪽) */
+  transform: translateX(100%);
+  opacity: 0;
+  transition: transform .28s ease, opacity .28s ease;
+  display: block; /* show/hidden 토글은 transform으로 처리 */
+}
+
+/* 열림 상태 */
+.top-note-panel.show{
+  transform: translateX(0);
+  opacity: 1;
+}
+
+/* 모션 최소화 환경 배려 */
+@media (prefers-reduced-motion: reduce){
+  .top-note-panel{
+    transition: none;
+  }
+}
+
+/* 아주 좁은 화면(예: 모바일)에서는 전체 폭 사용 */
+@media (max-width: 640px){
+  .person-section .frame-scroll-right{ margin-left: 16px; }
+  .person-section .frame-caption-bar{  margin-left: 16px; }
+  .top-note-panel{
+    width: 100vw;
+  }
+}
+
+/* 타이틀/바디/링크 스타일 유지 (필요시 조정) */
+.top-note-panel .note-title{
+  font-weight: 500;
+  font-size: 25px;
+  margin-bottom: 10px;
+  margin-left: 20px;
+  color: #000000;
+  border: 1px solid rgba(255,255,255,.06);
+}
+
+.top-note-panel .note-body{
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.top-note-panel .menu-links{
+  display: flex;
+  flex-direction: column;
+  gap: 23px;
+  font-size: 20px; /* index-section보다 작게 */
+  margin-top: 100px;
+  margin-left: 20px;
+  color: #545454;
+}
+
+.top-note-panel .menu-item{
+  cursor: pointer;
+  transition: opacity .2s;
+}
+.top-note-panel .menu-item:hover{
+  opacity: .6;
+}
+
+.top-note-panel .menu-divider{
+  height: 1px;
+  background-color: rgba(0,0,0,.2);
+}
+
+/* person 모달 열릴 때 상단 UI 숨김용 */
+.ui-hide { display: none !important; }
+
+
+/* ===== color2 ===== */
+
+/* 1) 섹션을 화면 가득 사용 */
+/* 섹션은 그대로 */
+.color2-section{
+  position: relative;
+  width: 100vw;
+  height: 1350px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  overflow: hidden;
+  z-index: 2;
+}
+
+/* 래퍼는 그대로 */
+.color2-wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+}
+
+/* 이미지: 중앙 정렬 & 섹션 가득 채우기 */
+.color2-image {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;       /* 그대로 */
+  height: 800px;     /* 그대로 */
+  transform: translate(-50%, -50%); /* 중앙 이동 */
+  object-fit: cover;                 /* 필요하면 유지 */
+  object-position: center;
+  display: block;
+}
+
+/* 오버레이는 위에 뜨도록 */
+.color2-overlay {
+  position: absolute;
+  z-index: 1;
+  bottom: 350px;
+  left: 60px;
+  color: #fff;
+  text-align: left;
+}
+
+.color2-sub {
+  font-size: 16px;
+  line-height: 1.5;
+  max-width: 420px; /* 살짝 넓게 */
+}
+
+
+/* 타이틀/본문 모두 34px */
+.color2-title{
+  font-size: 30px;
+  line-height: 1.25;
+}
+.color2-sub{
+  font-size: 20px;
+  line-height: 1.35;
+  max-width: 80ch;
+}
+
+/* Section */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { 
+      background:#000; 
+      color:#fff; 
+      overflow-x: hidden;
+       
+    }
+:root{
+      --gap: 12px;       
+      --card-w: 860px;   
+      --card-h: 450px;   
+      --radius: 10px;    
+      --box-bg: #1E1E1E;
+    }
+
+    .color3-section{
+      background:#000;
+      display:flex;
+      flex-direction: column;  
+      align-items:flex-start;  
+      gap: 16px;               
+      padding: 0 var(--gap);   
+      margin: var(--gap) 0;    
+    }
+    /* 기존에 있던 이 블록을 통째로 지우거나 주석 처리하세요 */
+
+/* 그리고 아래 (2)번의 새 코드로 교체합니다 */
+
+   
+
+    /* ABOUT */
+    .tone-about {
+      font-family: "Unna", serif;
+      font-weight: 400;
+      font-size: 30px;     /* 폰트 크기 키움 */
+      color: #ffffff;
+      opacity: 0.9;
+      margin-left: 15px;   /* 왼쪽에서 조금 떨어짐 */
+      margin-bottom: 8px;
+    }
+
+    /* Text Box */
+    .tone-box{
+      width: var(--card-w);
+      height: var(--card-h);
+      background: var(--box-bg);
+      border-radius: var(--radius);
+      display:flex;
+      flex-direction:column;
+      align-items:flex-start;
+      justify-content:center;
+      text-align:left;
+      gap: 20px;
+      padding: 28px;
+    }
+
+    .tone-title{ font-size: 28px; line-height:1.3; }
+    .tone-desc{ font-size: 18px; line-height:1.6; opacity:0.95; max-width:90%; }
+    .tone-examples{ font-size: 18px; line-height:1.5; opacity:0.9; }
+
+    /* Video Box */
+    .tone-video-wrap{
+      width: var(--card-w);
+      height: var(--card-h);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:#000;
+      overflow:hidden;
+      border-radius: var(--radius);
+    }
+    .tone-video{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+      border-radius: inherit;
+    }
+
+   
+    
+    .cut-section { background:#000; color:#fff; padding:5vw 0; text-align:left; }
+    .cut-ep { font-size:1.1vw; margin-left:5vw; margin-bottom:1.6vw; opacity:.8; font-weight:400; }
+    .cut-title { font-size:2.0vw; margin-left:5vw; margin-bottom:2vw; font-weight:400; }
+    .cut-desc { font-size:1.3vw; line-height:1.6; margin-left:5vw; margin-bottom:6.2vw; max-width:70%; font-weight:400; }
+
+    .cut-video { display:block; width:92%; height:auto; margin:1.6vw auto 0; }
+    .divider { width:95%; height:1px; background:rgba(255,255,255,.7); margin:6vw auto 4.2vw auto; }
+
+    .about-row{ width:95%; margin:0 auto 1.6vw auto; }
+    .about-label{ font-size:1.6vw; font-weight:600; letter-spacing:.06em; opacity:.95; }
+
+    .thumb-wrap { width:97%; max-width:2000px; margin:0 auto 6vw auto; }
+    .thumb-grid { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:1.2vw; }
+
+    .thumb-card{
+      --cap-inset:3%;
+      --cap-width:92%;
+      --cap-gap:.8vw;
+      display:flex; flex-direction:column; align-items:flex-start; gap:0; cursor:pointer;
+    }
+
+    .video-wrap{ position:relative; width:100%; }
+    .thumb-video{ width:100%; aspect-ratio:16/9; object-fit:cover; background:#111; border:1px solid rgba(255,255,255,.08); display:block; }
+
+    .center-play{
+      --size:clamp(24px,4vw,56px);
+      position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+      width:var(--size); height:var(--size); border-radius:50%;
+      background:rgba(0,0,0,.5); border:2px solid #fff; display:grid; place-items:center;
+    }
+    .center-play::before{
+      content:""; width:0; height:0;
+      border-left:calc(var(--size)*.26) solid #fff;
+      border-top:calc(var(--size)*.16) solid transparent;
+      border-bottom:calc(var(--size)*.16) solid transparent;
+    }
+
+    .tech-name{ font-weight:600; font-size:1.25vw; width:var(--cap-width); margin-left:var(--cap-inset); margin-top:var(--cap-gap); }
+    .cap-divider{ width:var(--cap-width); height:2px; background:rgba(255,255,255,.5); margin-left:var(--cap-inset); margin-top:var(--cap-gap); margin-bottom:.9vw; }
+    .tech-desc{ font-size:1.05vw; line-height:1.5; opacity:.9; width:var(--cap-width); margin-left:var(--cap-inset); }
+
+    /* =========================
+       📸 photo-style modal (video)
+       ========================= */
+    .photo-modal {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.9);
+      display: none; align-items: center; justify-content: center;
+      z-index: 2000;
+      overscroll-behavior: contain;
+    }
+    .photo-modal.visible { display: flex; }
+
+    .pm-content {
+      max-width:70vw; max-height:80vh; text-align:center; color:#fff; position:relative;
+      overflow:auto;
+    }
+    .pm-content video { max-width:100%; max-height:60vh; object-fit:contain; margin-bottom:20px; background:#000; }
+    .pm-title { font-size:22px; font-weight:700; margin-bottom:10px; }
+    .pm-desc { font-size:16px; line-height:1.5; white-space:pre-line; opacity:.9; }
+
+    .pm-close {
+      position: fixed; top:20px; right:30px;
+      font-size:40px; color:#fff; border:none; background:transparent; cursor:pointer; z-index:2500;
+    }
+
+    /* === 화살표(.pm-nav / .arrow-btn) : 모달 중앙 라인 좌우 === */
+    .pm-nav {
+      position: absolute;
+      top: 50%;
+      left: 0; right: 0;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 40px;
+      transform: translateY(-50%);
+      z-index: 2100;
+      pointer-events: none;
+    }
+    .pm-nav .arrow-btn {
+      width: 54px; height: 54px;
+      border-radius: 50%;
+      background-color: rgba(0,0,0,0.5);
+      border: 1.5px solid white;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      pointer-events: auto;
+    }
+    .pm-nav .arrow-icon {
+      width: 28px; height: 28px;
+      stroke: white; stroke-width: 2;
+      fill: none;
+      stroke-linecap: round; stroke-linejoin: round;
+      display:block;
+    }
+
+    /* =========================
+       스크롤 등장 애니메이션 (왼→오)
+       ========================= */
+    .reveal-x {
+      opacity: 0;
+      transform: translateX(-28px);
+      filter: blur(2px);
+      transition:
+        opacity .6s ease,
+        transform .6s ease,
+        filter .6s ease;
+      will-change: opacity, transform, filter;
+      transition-delay: var(--reveal-delay, 0ms);
+    }
+    .reveal-x.in-view {
+      opacity: 1;
+      transform: translateX(0);
+      filter: blur(0);
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      .reveal-x{ transition:none; transform:none; opacity:1; filter:none; }
+    }
+
+    /* 반응형 */
+    @media (max-width:1024px){
+      .cut-ep{ font-size:1.8vw; }
+      .cut-title{ font-size:3.4vw; }
+      .cut-desc{ font-size:2.2vw; max-width:86%; }
+      .thumb-grid{ gap:2.0vw; }
+      .tech-name{ font-size:2.0vw; }
+      .tech-desc{ font-size:2.0vw; }
+      .about-label{ font-size:2.0vw; }
+      .thumb-card{ --cap-inset:2%; --cap-width:96%; --cap-gap:1.0vw; }
+      .pm-content{ max-width:82vw; }
+    }
+    @media (max-width:640px){
+      .cut-ep{ font-size:3.2vw; margin-left:5vw; }
+      .cut-title{ font-size:6vw; margin-left:5vw; }
+      .cut-desc{ font-size:3.6vw; margin-left:5vw; max-width:90%; }
+      .thumb-grid{ grid-template-columns:1fr; gap:3.4vw; }
+      .tech-name{ font-size:3.8vw; }
+      .tech-desc{ font-size:3.4vw; }
+      .about-label{ font-size:3.8vw; }
+      .thumb-card{ --cap-inset:1%; --cap-width:98%; --cap-gap:2.0vw; }
+      .pm-content{ max-width:90vw; }
+      .pm-close{ top:14px; right:18px; font-size:34px; }
+      .pm-nav .arrow-btn{ width:44px; height:44px; }
+      .pm-nav .arrow-icon{ width:24px; height:24px; }
+    }
+    
+
+     :root {
+      --bg: #F5F4F2;
+      --ink: #35302A;
+      --Wc: min(100vw, 1320px);
+      --padX: clamp(20px, 4vw, 48px);
+      --gap1: clamp(16px, 2.4vw, 36px);
+      --gap2: clamp(28px, 4vw, 64px);
+      --gap3: clamp(36px, 5vw, 96px);
+      --gridGap: clamp(14px, 2vw, 28px);
+      --lineW: 2px;
+    }
+
+    .composition-section { background: var(--bg); color: var(--ink); width: 100%; }
+    .composition-inner { max-width: var(--Wc); margin: 0 auto; padding: var(--gap3) var(--padX); }
+
+    .hr-wrap { width: 100%; display: flex; justify-content: center; }
+    .hr-line { width: calc(var(--Wc) - var(--padX)*2); height: var(--lineW); background: var(--ink); opacity: .9; }
+
+    .title-block { text-align: center; margin: var(--gap2) auto 0 auto; }
+    .ep {
+      font-family: 'Manrope', system-ui;
+      font-weight: 400;
+      letter-spacing: .08em;
+      text-transform: lowercase;
+      font-size: clamp(14px, 1.4vw, 18px);
+      opacity:.9;
+    }
+    .title {
+      font-family: 'Manrope', system-ui;
+      font-weight: 800;
+      font-size: clamp(24px, 3.2vw, 56px);
+      line-height: 1.18;
+      margin-top: .6em;
+      letter-spacing: -.01em;
+    }
+
+    .hero-media { margin-top: var(--gap2); display: flex; justify-content: center; }
+    .hero-media img {
+      width: clamp(280px, 78vw, 1180px);
+      height: auto;
+      aspect-ratio: 16/7;
+      object-fit: cover;
+      display: block;
+    }
+
+    .desc {
+  margin-top: calc(var(--gap2) * 0.65); /* 사진과 설명 사이 간격 35% 축소 */
+  display: flex; 
+  justify-content: center;
+}
+
+    .desc p {
+  width: min(1100px, 92vw);
+  text-align: center; /* ← 중앙 정렬 */
+  font-family: 'Manrope', system-ui;
+  font-weight: 400;
+  font-size: clamp(14px, 1.25vw, 18px);
+  line-height: 1.7;
+  letter-spacing: 0.01em;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+    .tri-grid {
+      margin-top: var(--gap2);
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--gridGap);
+      justify-items: center;
+    }
+    .tri-card { width: 100%; max-width: 420px; }
+    .tri-card img { width: 100%; aspect-ratio: 4/5; object-fit: cover; display: block; background: #ddd; }
+    .tri-caption {
+      font-family: 'Manrope', system-ui;
+      font-weight: 400;
+      font-size: clamp(12px, 1.05vw, 16px);
+      line-height: 1.6;
+      margin-top: .9em;
+    }
+    .tri-caption .cap-title {
+      font-weight: 700;
+      font-size: clamp(14px, 1.3vw, 18px);
+      letter-spacing: 0.01em;
+      display:block;
+      margin-bottom: .25em;
+    }
+
+    .zigzag { margin-top: var(--gap3); display: grid; gap: var(--gap3); }
+    .zig-item { display: grid; grid-template-columns: 1.1fr 1fr; align-items: center; gap: var(--gridGap); }
+    .zig-item:nth-child(even) { grid-template-columns: 1fr 1.1fr; }
+    @media (max-width: 960px){ .zig-item, .zig-item:nth-child(even){ grid-template-columns: 1fr; } }
+
+    .media-box { position: relative; width: 100%; overflow: hidden; background: #ddd; cursor: pointer; isolation: isolate; }
+    .media-box img, .media-box video { width: 100%; height: 100%; object-fit: cover; display: block; aspect-ratio: 16/9; }
+    .media-box video { position: absolute; inset:0; opacity:0; transition: opacity .28s ease; }
+    .media-box:hover video { opacity:.9; }
+    .media-box.playing img { opacity: 0; }
+    .media-box.playing video { opacity: 1; }
+
+    .zig-text h4 {
+  font-family: 'Manrope', system-ui;
+  font-weight: 700; /* 동일한 두께로 맞춤 */
+  font-size: clamp(16px, 1.5vw, 22px);
+  margin-bottom: .45em;
+}
+
+    .zig-text p {
+      font-family: 'Manrope', system-ui;
+      font-weight: 400;
+      font-size: clamp(13px, 1.1vw, 16px);
+      line-height: 1.7;
+    }
+
+    .section-end { margin-top: calc(var(--gap3) + 40px); padding-bottom: var(--gap3); }
+
+   /* person 사진 모달을 light 모달 톤으로 맞춤 */
+.modal{
+  background: #ffffff;
+}
+
+/* 모달 텍스트도 어두운 배경용으로 */
+.modal-title{ color:#000000; }
+.modal-desc { color: #000000; }
+
+/* person 모달 X 버튼 스타일 통일 */
+/* person 모달 X 버튼 크기 light 모달과 동일하게 */
+.modal .close-btn{
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  font-size: 40px;   /* ✅ 50px → 40px */
+  line-height: 1;
+  color: #000000;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  z-index: 3001;
+  font-weight: 700;
+  text-shadow: 0 0 0.5px rgba(255,255,255,0.7);
+}
+
+/* light2 왼쪽 사진 크로스페이드 */
+.light2-left-photo {
+  position: relative;
+  overflow: hidden;
+}
+.light2-left-photo .fade-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.8s ease; /* ← 페이드 속도/곡선 */
+  will-change: opacity;
+}
+.light2-left-photo .fade-img.show { opacity: 1; }
+
+/* 기존 가시성 토글과 어울리도록 살짝 */
+.light2-left-photo.is-hidden { 
+  opacity: 0; 
+  transition: opacity .3s ease;
+}
+
+/* ✅ person 고정 사진 컨테이너 + 크로스페이드 전용 */
+.person-left-photo .fade-img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%; object-fit: cover;
+  opacity: 0; transition: opacity 280ms ease; /* 속도 원하면 조절 */
+}
+.person-left-photo .fade-img.show { opacity: 1; }
+
+/* 기존 .person-left-photo 블록을 이걸로 교체 */
+.person-left-photo{
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: var(--person-left-w);
+  height: 100vh;
+  z-index: 2;
+  overflow: hidden;
+  opacity: 0;             /* 기본은 숨김 */
+  visibility: hidden;     /* 기본은 숨김 */
+  transition: opacity .32s ease;
+}
+.person-left-photo.is-shown{
+  opacity: 1;             /* 섹션 교차 시에만 보임 */
+  visibility: visible;
+}
+
+/* 메뉴가 열린 동안엔 왼쪽 고정 시각물 전부 숨김 */
+.menu-open .person-left-photo,
+.menu-open .light2-left-photo{
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+
+
+.person-left-photo .fade-img{
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  opacity: 0; transition: opacity 280ms ease;
+}
+.person-left-photo .fade-img.show{ opacity: 1; }
+
+
+:root{
+  --person-left-w: 40vw;                                    /* ⬅ 왼쪽 40% */
+  --right-pane-width: calc(100vw - var(--person-left-w));   /* = 60vw */
+  --note-width: calc(var(--right-pane-width) / 2);          /* (옵션) 쓰고 있으면 계속 사용 */
+  --shot-col-gap:84px;   /* ← 가로 간격만 더 넓게 */
+  --shot-row-gap: 200px;  /* 세로 간격은 그대로 */
+  --person-gap-extra: 24px;
+}
+
+:root{
+  /* person-left(40vw)와 동일하게 사용 */
+  --light2-left-w: var(--person-left-w);                 /* = 40vw */
+  --light2-right-w: calc(100vw - var(--light2-left-w));  /* = 60vw */
+}
+
+
+/* =========================
+   color3: 2-up (48%) responsive
+   ========================= */
+
+/* 컨테이너: 두 칼럼 랩 & 중앙 정렬 */
+.color3-section .color3-section-content{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;                /* 가운데 정렬 */
+  gap: clamp(6px, 1.5vw, 16px);          /* 카드 사이 간격 */
+  width: 100%;
+  margin-top: 8px;                        /* ABOUT 밑 여백(원하면 조절) */
+}
+
+/* 아이템: 각 48% 고정폭(반응형) */
+.color3-section .tone-box,
+.color3-section .tone-video-wrap{
+  flex: 0 1 49%;
+  max-width: 49%;
+  width: 49%;
+  height: auto;
+  aspect-ratio: 860 / 450;
+}
+
+
+/* 내부 비디오는 꽉 채우기 */
+.color3-section .tone-video{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: inherit;
+}
+
+/* 텍스트 박스 패딩/타이포 유지 (필요 시 조정 가능) */
+.color3-section .tone-box{
+  background: var(--box-bg);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
+  padding: 28px;
+  text-align: left;
+}
+
+/* 작은 화면에서는 1열로 자동 스택 */
+@media (max-width: 900px){
+  .color3-section .tone-box,
+  .color3-section .tone-video-wrap{
+    flex-basis: 100%;
+    max-width: 100%;
+    width: 100%;
+    aspect-ratio: 860 / 450;  /* 원하면 16/9 등 다른 비율로 변경 가능 */
+  }
+}
+
+
+/* ===== Color 섹션: 인디케이터는 '영상 안쪽', 화살표는 '영상 바깥 더 멀리' ===== */
+:root{
+  /* ▶ 반응형 비디오 크기 */
+  --videoW: clamp(720px, 70vw, 1160px);
+  --videoH: calc(var(--videoW) * 9 / 16);
+
+  /* ▶ 화살표 크기/바깥 여유(더 멀리!) */
+  --ui: clamp(40px, 7vmin, 84px);
+  --icon: calc(var(--ui) * .52);
+  --borderW: clamp(0.5px, .22vmin, 2px);
+  --arrowOutside: clamp(48px, 6vmin, 128px); /* ← 필요하면 더 키워도 됨 */
+
+  /* ▶ 작은 동그라미(5개) 크기/간격/영상 안쪽 여백 */
+  --dot: clamp(5px, 1vmin, 9px);      /* ⬅ 기존보다 축소 */
+  --dot-gap: clamp(6px, 1.2vmin, 14px); /* 간격도 살짝 축소(선택) */
+  --dotsInset: clamp(26px, 3vmin, 44px); /* 영상 하단에서 위로 띄우는 거리 */
+}
+
+/* 비디오: 중앙 고정 + 반응형 크기 */
+.color-section .color-video{
+  width: var(--videoW) !important;
+  height: var(--videoH) !important;
+  z-index: 1;
+}
+
+/* 화살표 컨테이너 폭 = 영상폭 + 양쪽 바깥 여유(버튼이 '영상 밖'으로) */
+.color-section .color-nav{
+  width: calc(var(--videoW) + 2 * (var(--arrowOutside) + var(--ui)/2)) !important;
+  padding: 0 !important;
+  z-index: 5;
+}
+
+/* 화살표 버튼/아이콘 크기(반응형) */
+.color-section .arrow-btn{
+  width: var(--ui) !important;
+  height: var(--ui) !important;
+  border-width: var(--borderW) !important;
+}
+.color-section .arrow-icon{
+  width: var(--icon) !important;
+  height: var(--icon) !important;
+  stroke-width: clamp(1px, .22vmin, 2px) !important;
+}
+
+/* 작은 동그라미(5개) → '영상 위'에, 하단에서 --dotsInset 만큼 올라오게 */
+.color-section .color-indicators{
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: var(--dot-gap);
+  z-index: 6;
+
+  /* 컨테이너(100vh) 기준 계산:
+     화면 바닥→영상 바닥까지 거리: (100vh - var(--videoH))/2
+     거기서 --dotsInset 만큼 더 '위'로 올림(영상 안쪽 배치) */
+  bottom: calc(((100vh - var(--videoH)) / 2) + var(--dotsInset)) !important;
+}
+.color-section .color-indicators .dot{
+  width: var(--dot) !important;
+  height: var(--dot) !important;
+  border-radius: 50%;
+}
+
+/* 작은 화면에서는 점 너무 올라오지 않게 살짝 보정(선택) */
+@media (max-width: 840px){
+  :root{ --dotsInset: clamp(12px, 2vmin, 24px); }
+}
+
+.color3-section { --radius: 0px; }
+
+
+ :root{
+    --frame-zoom: 1.15;       /* 결과창 전체 스케일 */
+    --subtitle-bottom: 90px;  /* 자막을 아래 버튼과 안 겹치게 살짝 위로 */
+  }
+
+ 
+ 
+
+  .camera-section{
+  min-height: 100svh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  /* 로컬 경로만 사용 (HTML과 같은 루트의 /photo/camera1.jpg) */
+  background-image: url('./photo/camera1.jpg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: scroll; /* 고정 아님 */
+
+  padding: clamp(24px, 4vw, 48px);
+}
+
+  .camera-wrap{
+  width: min(96vw, 1580px);      /* 살짝 확대 허용 */
+  display:grid;
+  grid-template-columns: minmax(340px, 1fr) clamp(120px, 18vw, 240px);
+  gap: clamp(16px,2vw,28px);
+  align-items:start;
+  position:relative;
+}
+  .stage-outer{ position:relative; }
+
+  .stage{
+  width:100%;
+  max-width: 1200px;     /* 너무 커지는 것 방지 (원하면 더 키워도 ok) */
+  min-width: 340px;      /* 너무 작아지는 것 방지 */
+  aspect-ratio:16/9;
+  position:relative;
+  background:#000; overflow:hidden; border-radius:0;
+  box-shadow:0 12px 48px rgba(0,0,0,.55);
+  cursor:pointer; isolation:isolate;
+}
+  /* ▶ 미러(좌우반전) 미리보기 */
+  .stage video{
+    position:absolute; inset:0; width:100%; height:100%;
+    object-fit:cover; filter:var(--fx, none);
+    transform:scaleX(-1);
+  }
+
+  /* 레터박스 제거 */
+  .letterbox{ display:none !important; }
+
+  .tint{ position:absolute; inset:0; pointer-events:none; background:var(--tint, transparent); mix-blend-mode:var(--blend, normal); opacity:var(--tintAlpha, 0); }
+
+  .subtitle{
+    position:absolute; left:50%; transform:translateX(-50%);
+    bottom: var(--subtitle-bottom);
+    max-width:min(88%,980px); z-index:5; text-align:center; line-height:1.32;
+    font-size:clamp(14px,1.3vw,20px);
+    letter-spacing:.01em; user-select:none; pointer-events:none;
+    text-shadow: 0 0 1px rgba(0,0,0,.6), 0 1px 2px rgba(0,0,0,.45), 0 0 6px rgba(0,0,0,.35);
+  }
+
+/* 스테이지 오른쪽 끝과 1px도 안 어긋나게 변수로 보정 */
+.shot-indicator{
+  position:absolute;
+  top: calc(-1 * clamp(36px, 6vw, 72px));
+  right: var(--stage-gap, 0px);   /* ← 여기만 교체 */
+  display:flex;
+  gap: clamp(6px, 1vw, 12px);
+  z-index:10; align-items:center;
+  pointer-events:none;
+}
+@media (max-width:900px){
+  .shot-indicator{
+    top: calc(-1 * clamp(32px, 7vw, 56px));
+    right: var(--stage-gap, 0px); /* ← 동일 유지 */
+  }
+}
+
+
+.shot-count{
+  font-size: clamp(12px, 1.4vw, 18px);
+  font-weight: 600;   /* 800 → 600 */
+  opacity:.95;
+  margin-right: clamp(4px, .6vw, 8px);
+}
+.thumb{
+  width: clamp(46px, 6.2vw, 76px);
+  height: clamp(30px, 3.9vw, 48px);
+  border: clamp(1px, .25vw, 2px) solid #fff;  /* ← 여기만 교체 */
+  border-radius: 0;
+  overflow: hidden;
+  background: rgba(255,255,255,.12);
+  display: grid;
+  place-items: center;
+}
+/* 각 썸네일 안 숫자 */
+.thumb .num{
+  font-size: clamp(10px, 1.2vw, 14px);
+  font-weight: 600;   /* 800 → 600 */
+  color:#fff; opacity:.95;
+}
+.thumb img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;   /* 가득 채우되 비율 유지 */
+  display: block;
+  image-rendering: auto;
+}
+  .shutter-btn{
+  position:absolute; left:50%; transform:translateX(-50%); bottom:2%;
+  width: clamp(40px, 6vw, 60px);
+  height: clamp(40px, 6vw, 60px);
+  border-radius:50%;
+  border:1px solid rgba(255,255,255,.9);
+  background:rgba(0,0,0,.35);
+  display:grid; place-items:center; z-index:5; pointer-events:none;
+  box-shadow:0 2px 8px rgba(0,0,0,.45);
+}
+.shutter-icon{ width: clamp(22px, 3.4vw, 34px); height: auto; object-fit:contain; opacity:.95; filter:drop-shadow(0 1px 3px rgba(0,0,0,.6)); }
+
+  /* ▶ 스타트 오버레이 (힌트 문구 제거) */
+  .starter{
+    position:absolute; inset:0; display:grid; place-items:center;
+    background:rgba(0,0,0,.45); backdrop-filter:blur(1px); z-index:6;
+  }
+  .starter-inner{
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:10px; padding:16px 20px; border-radius:12px;
+    background:rgba(0,0,0,.35); box-shadow:0 6px 20px rgba(0,0,0,.35);
+  }
+  /* 스타트 버튼: 화면 비례 스케일 적용 */
+.start-btn{
+  padding: clamp(10px, 1.6vw, 14px) clamp(14px, 2.4vw, 20px);
+  border-radius: 999px;
+  background:#fff; color:#111; font-weight:800; border:none; cursor:pointer;
+  font-size: clamp(12px, 1.4vw, 16px);
+  line-height: 1;
+  border: clamp(1px, .2vw, 2px) solid rgba(0,0,0,.1);
+  box-shadow: 0 4px 14px rgba(0,0,0,.18);
+}
+
+
+  .flash{ position:absolute; inset:0; background:#fff; opacity:0; pointer-events:none; z-index:7; }
+  .countdown{
+    position:absolute; inset:0; display:none; place-items:center; z-index:8;
+    background:rgba(0,0,0,.25); backdrop-filter:blur(1px);
+    font-weight:800; font-size:clamp(32px,10vw,120px); text-shadow:0 4px 16px rgba(0,0,0,.4);
+  }
+  .countdown .num{ transform:scale(0.88); opacity:0; }
+  .countIn{ animation:countIn .5s ease forwards; }
+  @keyframes countIn{ 0%{transform:scale(0.8);opacity:0;} 60%{transform:scale(1.05);opacity:1;} 100%{transform:scale(1.0);opacity:1;} }
+
+ 
+/* 사이드바: 오른쪽 컬럼에서 가로 중앙 + sticky + 비례폭 */
+.sidebar{
+  display: grid;
+  gap: clamp(8px, 1.2vw, 14px);
+  align-content: start;
+  width: clamp(120px, 18vw, 240px);
+  min-width: 120px;
+  position: sticky;
+  top: clamp(10px, 4vh, 24px);
+  align-self: start;
+  justify-self: center; /* ← 가로 중앙 */
+}
+
+
+.sidebar .label{
+  font-size: clamp(10px, 1.1vw, 12px);
+  letter-spacing:.08em; text-transform:uppercase; opacity:.9;
+}
+.genre-grid{ display:grid; gap: clamp(6px, 1vw, 10px); }
+.btn{
+  border:1px solid rgba(255,255,255,.35);
+  background:rgba(255,255,255,.06);
+  height: clamp(32px, 5vw, 38px);
+  border-radius:10px;
+  display:grid; place-items:center; cursor:pointer; user-select:none;
+  font-size: clamp(11px, 1.2vw, 12px);
+  padding: 0 clamp(8px, 1.2vw, 12px);
+}
+
+  .btn:hover{ background:rgba(255,255,255,.12); }
+  .btn.active{ outline:2px solid #fff; outline-offset:2px; }
+
+  /* ===== 결과 오버레이 ===== */
+  .result-overlay{
+    position:fixed; inset:0; display:none; z-index:50;
+    background:#F5F4F2;
+    --overlayBg:#F5F4F2;
+    color:#111;
+    overflow: hidden;
+  }
+  .rs-wrap{
+    overflow: hidden;
+  -webkit-overflow-scrolling: auto;
+    position:absolute; inset:0; display:grid; grid-template-rows:auto 1fr auto;
+    padding:clamp(12px,3vw,24px); gap:clamp(8px,2vw,16px);
+    
+  }
+  .rs-top{ display:flex; justify-content:flex-end; align-items:center; gap:12px; }
+  .rs-close{ appearance:none; border:none; background:transparent; color:#111; font-weight:800; font-size:clamp(18px,2.6vw,28px); cursor:pointer; }
+
+  /* 좌측 스킨 스위처 (4개) */
+  .style-switcher{
+    position:absolute; left:clamp(8px,2vw,16px); top:50%; transform:translateY(-50%);
+    display:flex; flex-direction:column; gap:8px; z-index:60; pointer-events:auto;
+  }
+  .style-btn{
+    padding:8px 10px; font-size:12px; font-weight:800; letter-spacing:.02em;
+    background:#fff; color:#111; border:2px solid #111;
+    border-radius:8px; cursor:pointer; user-select:none;
+  }
+  .style-btn:hover{ background:#111; color:#fff; }
+  .style-btn.is-active{ background:#111; color:#F5F4F2; }
+
+  /* 공통 프레임 (결과 박스) */
+  .frame{
+    background:#fff; border:0; border-radius:0;
+    box-shadow:0 8px 24px rgba(0,0,0,.12);
+    overflow:hidden; place-self:center; display:grid; position:relative;
+    transform: scale(var(--frame-zoom));
+    transform-origin: center;
+  }
+  .frame-inner{ position:relative; padding:clamp(8px, 1.2vw, 14px); height:100%; }
+  .frame-inner.tight{ padding:clamp(4px, .8vw, 8px); }
+  .frame-inner.equal-padding{ padding:clamp(12px, 1.8vw, 20px); }
+
+  .rs-grid{
+    width:100%; height:100%;
+    display:grid; gap:16px;
+    justify-content:center; align-content:start;
+    justify-items:center; align-items:start;
+  }
+
+  /* 🔧 핵심: 이미지 늘어남 방지 (자연 비율 유지 + 중앙 정렬) */
+  .tile{
+    width:100%;
+    aspect-ratio:16/9;
+    display:flex; align-items:center; justify-content:center;
+    background:transparent;
+  }
+  .tile img{
+    max-width:98%;
+    max-height:98%;
+    width:auto;             /* 자연 비율 */
+    height:auto;            /* 자연 비율 */
+    display:block;
+    opacity:0; transform:scale(0.98); animation:rsIn .24s ease forwards;
+  }
+  @keyframes rsIn{ to{ opacity:1; transform:scale(1); } }
+
+  /* ---- 모드별 규격 ---- */
+  .frame--basic-fixed{ width:250px; height:700px; }
+  .layout-basic-fixed{ grid-template-columns:1fr; grid-auto-rows:122px; }
+  .layout-basic-fixed .tile{ width:100%; height:122px; aspect-ratio:auto; }
+  .layout-basic-fixed .tile img{ margin-top:8px; } /* 크기는 auto, 여백만 유지 */
+
+  .frame--2x2-fixed{ width:800px; height:580px; }
+  .layout-2x2{ grid-template-columns:repeat(2,1fr); grid-template-rows:repeat(2,1fr); height:100%; width:100%; row-gap:10px; }
+  .layout-2x2 .tile:nth-child(n+3){ margin-top:-18px; }
+
+  .frame--strip-fixed{ width:min(92vw,1100px); height:210px; }
+  .layout-strip{ grid-template-columns:repeat(4,1fr); grid-auto-rows:var(--stripH, auto); }
+  .layout-strip .tile{ height:var(--stripH, auto); aspect-ratio:auto; }
+
+  /* Frame 스킨 */
+  .frame.black{ background:#000 !important; }
+  .frame.film{ background:#000 !important; }
+  .frame.film.film--perforated::before,
+  .frame.film.film--perforated::after{
+    content:""; position:absolute; left:0; right:0; height:18px;
+    background:
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='18' viewBox='0 0 28 18'><rect x='8' y='3' width='12' height='12' fill='%23F5F4F2'/></svg>")
+      left top / 28px 18px repeat-x,
+      #000;
+  }
+  .frame.film.film--perforated::before{ top:0; }
+  .frame.film.film--perforated::after{ bottom:0; }
+
+  /* 하단 중앙 모드 버튼 */
+  .rs-bottom{
+    position:absolute; left:50%; bottom:clamp(12px,2vw,20px); transform:translateX(-50%);
+    z-index:65; pointer-events:auto;
+  }
+  .mode-bar{ display:flex; gap:8px; }
+  .mode-btn{
+    padding:8px 10px; font-size:12px; font-weight:800; letter-spacing:.02em;
+    background:#fff; color:#111; border:2px solid #111; border-radius:8px; cursor:pointer; user-select:none; line-height:1;
+  }
+  .mode-btn:hover{ background:#111; color:#F5F4F2; }
+  .mode-btn.is-active{ background:#111; color:#F5F4F2; }
+
+  /* 우하단 다운로드 (JPG만) */
+  .rs-download{
+    position:absolute; right:clamp(12px,2vw,24px); bottom:clamp(12px,2vw,20px);
+    display:flex; align-items:center; gap:10px; z-index:70; pointer-events:auto;
+  }
+  .dl-btn{
+    padding:10px 14px; border:2px solid #111; background:#fff; color:#111; font-weight:800; cursor:pointer; border-radius:10px;
+  }
+  .dl-btn:hover{ background:#111; color:#F5F4F2; }
+
+  @media (max-width:900px){
+  /* 모바일에서도 2컬럼 유지: 스테이지 + 오른쪽 패널 */
+  .camera-wrap{
+    grid-template-columns: minmax(0, 1fr) clamp(120px, 24vw, 200px);
+  }
+
+  /* 사이드바는 패널 레이아웃 그대로, 버튼이 세로로 쌓이게 */
+  .sidebar{
+    position: sticky;
+    top: clamp(10px, 4vh, 20px);
+    align-self: start;
+  }
+
+  /* 썸네일 인디케이터만 살짝 위치 보정 */
+  .shot-indicator{ top:-52px; right:0; }
+}
+
+/* 스테이지를 칼럼 가로 중앙으로 */
+.stage { margin-inline: auto; }
+
+/* 스테이지 박스 자체를 가운데로 두는 안전 장치(선택) */
+.stage-outer { display: grid; justify-items: center; }
+
+
+:root{
+  /* 전체 블록을 아래로 내리는 양 (원하는 만큼 조절) */
+  --ui-shift: clamp(16px, 6vh, 96px);
+}
+
+/* 카메라+필터 래퍼 전체를 같이 아래로 */
+.camera-wrap{
+  margin-top: var(--ui-shift);
+}
+
+/* ===== 결과창 버튼 반응형 스케일 오버라이드 ===== */
+
+/* 여백/간격도 비례 조정 */
+.rs-wrap{
+  gap: clamp(8px, 1.6vw, 18px);
+  padding: clamp(10px, 2.4vw, 24px);
+}
+.rs-top{ gap: clamp(8px, 1.2vw, 14px); }
+.rs-download{ gap: clamp(8px, 1.2vw, 14px); }
+
+/* 닫기 버튼(우상단 X) */
+.rs-close{
+  font-size: clamp(18px, 2.6vw, 32px);
+  line-height: 1;
+  padding: clamp(4px, .6vw, 8px) clamp(6px, .8vw, 10px);
+}
+
+/* 좌측 스킨 스위처 컨테이너 간격 */
+.style-switcher{
+  gap: clamp(6px, 1.0vw, 10px);
+}
+
+/* 좌측 스킨 버튼 4개 */
+.style-btn{
+  font-size: clamp(10px, 1.05vw, 12px);
+  font-weight: 800;
+  letter-spacing: .02em;
+  padding: clamp(6px, 1.0vw, 10px) clamp(8px, 1.4vw, 14px);
+  border-width: clamp(1px, .2vw, 2px);
+  border-radius: clamp(6px, .9vw, 10px);
+}
+
+/* 하단 모드 버튼 바 */
+.mode-bar{ gap: clamp(6px, 1.0vw, 10px); }
+
+/* 하단 모드 버튼(Basic / 2x2 / Strip) */
+.mode-btn{
+  font-size: clamp(11px, 1.1vw, 13px);
+  line-height: 1;
+  padding: clamp(6px, 1.0vw, 10px) clamp(10px, 1.6vw, 16px);
+  border-width: clamp(1px, .2vw, 2px);
+  border-radius: clamp(6px, .9vw, 10px);
+}
+
+/* 우하단 다운로드 버튼 */
+.dl-btn{
+  font-size: clamp(11px, 1.1vw, 13px);
+  line-height: 1;
+  padding: clamp(8px, 1.2vw, 12px) clamp(12px, 1.8vw, 18px);
+  border-width: clamp(1px, .2vw, 2px);
+  border-radius: clamp(8px, 1.1vw, 12px);
+}
+
+/* 결과 프레임의 바깥 여백(버튼이 너무 붙지 않도록) */
+.rs-bottom{
+  bottom: clamp(10px, 2vw, 22px);
+}
+.rs-download{
+  right: clamp(10px, 2vw, 24px);
+  bottom: clamp(10px, 2vw, 22px);
+}
+
+
+
+/* 전역 스크롤 즉시 이동 강제 */
+html, body { scroll-behavior: auto !important; }
+
+/* === Color 섹션: 영상+화살표+인디케이터를 한 번에 위로 === */
+:root { --color-lift: 72px; }  /* ↑ 더 올리려면 숫자 키워요 (예: 96px, 120px) */
+
+.color-section .color-video{
+  top: calc(50% - var(--color-lift)) !important;   /* 영상 ↑ */
+}
+
+.color-section .color-nav{
+  top: calc(50% - var(--color-lift)) !important;   /* 화살표 ↑ */
+}
+
+.color-section .color-indicators{
+  bottom: calc(
+    ((100vh - var(--videoH)) / 2) + var(--dotsInset) + var(--color-lift)
+  ) !important;                                     /* 작은 동그라미 ↑ */
+}
+
+/* 모바일에선 과하게 느껴지면 완화 */
+@media (max-width: 840px){
+  :root { --color-lift: 44px; }
+}
+
+/* === color3 지그재그 복구: reverse 섹션은 좌우 순서 스왑 === */
+.color3-section.reverse .color3-section-content{ 
+  flex-direction: row; /* 안전장치 */
+}
+.color3-section.reverse .tone-box{ 
+  order: 2 !important;        /* 텍스트 오른쪽 */
+}
+.color3-section.reverse .tone-video-wrap{ 
+  order: 1 !important;        /* 영상 왼쪽   */
+}
+
+/* 모바일에서는 1열 스택으로 자연스럽게 (텍스트 → 영상) */
+@media (max-width: 900px){
+  .color3-section.reverse .tone-box,
+  .color3-section.reverse .tone-video-wrap{
+    order: initial !important;
+  }
+}
+
+
+/* === person 오른쪽 2열 미세 위치 보정 === */
+/* - 값: 왼쪽 / + 값: 오른쪽 */
+:root{
+  --person-col-left:  -24px;  /* 1,3,5,7번(왼쪽 세로줄) */
+  --person-col-right:  28px;  /* 2,4,6,8번(오른쪽 세로줄) */
+}
+
+/* 왼쪽 세로줄 조금 더 왼쪽 */
+.person-section .frame-scroll-right .grid-card:nth-child(2n+1){
+  transform: translateX(var(--person-col-left));
+  will-change: transform;
+}
+
+/* 오른쪽 세로줄 더 오른쪽 */
+.person-section .frame-scroll-right .grid-card:nth-child(2n){
+  transform: translateX(var(--person-col-right));
+  will-change: transform;
+}
+
+/* 모바일에선 중앙 유지 */
+@media (max-width: 900px){
+  :root{
+    --person-col-left: 0px;
+    --person-col-right: 0px;
+  }
+}
+
+
+  </style>
+</head>
+<body>
+  
+  <div class="tl-timelog-btn" id="timelogBtn">TIMELOG</div>
+
+  <!-- 오른쪽 상단 두 줄(메뉴) 버튼 -->
+<button class="tl-menu-btn" id="menuBtn" aria-label="Open note" aria-expanded="false">
+  <span class="bar"></span>
+  <span class="bar"></span>
+</button>
+
+<!-- 상단 네모 패널 -->
+<div class="top-note-panel" id="topNote">
+  <div class="note-title">MENU</div>
+  <div class="note-body">
+    <div class="menu-links">
+      <div class="menu-item" data-target="home">Home</div>
+      <div class="menu-item" data-target="menu">Menu</div>
+      <div class="menu-divider"></div>
+      <div class="menu-item" data-target="index">Photographing a person</div>
+      <div class="menu-item" data-target="cut">Cut</div>
+      <div class="menu-item" data-target="frame">Composition</div>
+      <div class="menu-item" data-target="light">Light</div>
+      <div class="menu-item" data-target="color">Color</div>
+      <div class="menu-divider"></div>
+      <div class="menu-item" data-target="camera">Camera</div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+<section class="index-section" id="index-section"  >
+    <video autoplay muted loop playsinline>
+      <source src="video/light0.mp4" type="video/mp4">
+      브라우저가 video 태그를 지원하지 않습니다.
+    </video>
+   
+  </section>
+
+
+  <!-- ✅ 기법 1: person (Frame → 이름 수정됨) -->
+<section class="person-section" id="person-section">
+  <!-- ✅ person 고정사진: class명을 person-left-photo로, A/B 두 레이어 -->
+<div class="person-left-photo">
+  <img id="person-img-a" class="fade-img show" src="person/photo1.JPG" alt="Reference portrait A">
+  <img id="person-img-b" class="fade-img"      src="person/photo1.JPG" alt="Reference portrait B" aria-hidden="true">
+</div>
+
+
+  <div class="frame-scroll-right">
+    <div class="grid-card" data-title="Extreme Long Shot">
+      <div class="grid-item">
+        <img src="person/Extreme long shot1.jpg" alt="Extreme Long Shot">
+      </div>
+      <div class="label">Extreme Long Shot</div>
+    </div>
+
+    <div class="grid-card" data-title="Long Shot">
+      <div class="grid-item">
+        <img src="person/Long shot1.jpg" alt="Long Shot">
+      </div>
+      <div class="label">Long Shot</div>
+    </div>
+
+    <div class="grid-card" data-title="Full Shot">
+      <div class="grid-item">
+        <img src="person/Full shot1.jpg" alt="Full Shot">
+      </div>
+      <div class="label">Full Shot</div>
+    </div>
+
+    <div class="grid-card" data-title="Knee Shot">
+      <div class="grid-item">
+        <img src="person/Knee shot1.jpg" alt="Knee Shot">
+      </div>
+      <div class="label">Knee Shot</div>
+    </div>
+
+    <div class="grid-card" data-title="Waist Shot">
+      <div class="grid-item">
+        <img src="person/Waist shot1.jpg" alt="Waist Shot">
+      </div>
+      <div class="label">Waist Shot</div>
+    </div>
+
+    <div class="grid-card" data-title="Bust Shot">
+      <div class="grid-item">
+        <img src="person/Bust shot1.jpg" alt="Bust Shot">
+      </div>
+      <div class="label">Bust Shot</div>
+    </div>
+
+    <div class="grid-card" data-title="Close Up">
+      <div class="grid-item">
+        <img src="person/Close up1.jpg" alt="Close Up">
+      </div>
+      <div class="label">Close Up</div>
+    </div>
+
+    <div class="grid-card" data-title="Extreme Close Up">
+      <div class="grid-item">
+        <img src="person/Extreme close up1.jpg" alt="Extreme Close Up">
+      </div>
+      <div class="label">Extreme Close Up</div>
+    </div>
+  </div>
+</section>
+
+
+<section class="cut-section" id="cut-section">
+    <div class="cut-ep">episode.2</div>
+    <div class="cut-title">Cut Technique</div>
+    <div class="cut-desc">
+      The cut technique is an editing method that cuts and connects scenes that make up an image.<br>
+      Beyond simple screen transitions, it is the core grammar of the movie that controls time and space and creates the rhythm and meaning of the story.
+    </div>
+
+    <video class="cut-video" src="video/cut0.mp4" preload="metadata" muted playsinline autoplay loop></video>
+    <div class="divider"></div>
+
+    <div class="about-row"><div class="about-label">ABOUT</div></div>
+
+    <!-- 1행 -->
+    <div class="thumb-wrap">
+  <div class="thumb-grid">
+    <div class="thumb-card reveal-x">
+      <div class="video-wrap">
+        <video class="thumb-video" src="video/cut1.mp4" preload="metadata" muted></video>
+        <div class="center-play" aria-hidden="true"></div>
+      </div>
+      <div class="tech-name">Match Cut</div>
+      <div class="cap-divider" aria-hidden="true"></div>
+      <div class="tech-desc">Connects two shots where shape, color, or movement align, creating a seamless visual transition.</div>
+    </div>
+    <div class="thumb-card reveal-x">
+      <div class="video-wrap">
+        <video class="thumb-video" src="video/cut2.mp4" preload="metadata" muted></video>
+        <div class="center-play" aria-hidden="true"></div>
+      </div>
+      <div class="tech-name">J-Cut</div>
+      <div class="cap-divider" aria-hidden="true"></div>
+      <div class="tech-desc">The audio of the next scene is heard first, and the video follows, producing a smooth lead-in.</div>
+    </div>
+    <div class="thumb-card reveal-x">
+      <div class="video-wrap">
+        <video class="thumb-video" src="video/cut3.mp4" preload="metadata" muted></video>
+        <div class="center-play" aria-hidden="true"></div>
+      </div>
+      <div class="tech-name">Jump Cut</div>
+      <div class="cap-divider" aria-hidden="true"></div>
+      <div class="tech-desc">Skips forward in time within the same subject or setting, making the action appear to jump abruptly.</div>
+    </div>
+  </div>
+</div>
+
+<!-- 2행 -->
+<div class="thumb-wrap">
+  <div class="thumb-grid">
+    <div class="thumb-card reveal-x">
+      <div class="video-wrap">
+        <video class="thumb-video" src="video/cut4.mp4" preload="metadata" muted></video>
+        <div class="center-play" aria-hidden="true"></div>
+      </div>
+      <div class="tech-name">Point-of-View (POV) Cut</div>
+      <div class="cap-divider" aria-hidden="true"></div>
+      <div class="tech-desc">Shows the scene from a character’s exact viewpoint, giving a subjective perspective.</div>
+    </div>
+    <div class="thumb-card reveal-x">
+      <div class="video-wrap">
+        <video class="thumb-video" src="video/cut5.mp4" preload="metadata" muted></video>
+        <div class="center-play" aria-hidden="true"></div>
+      </div>
+      <div class="tech-name">Content Cut</div>
+      <div class="cap-divider" aria-hidden="true"></div>
+      <div class="tech-desc">Breaks the scene to convey story or information, clarifying the narrative flow.</div>
+    </div>
+    <div class="thumb-card reveal-x">
+      <div class="video-wrap">
+        <video class="thumb-video" src="video/cut6.mp4" preload="metadata" muted></video>
+        <div class="center-play" aria-hidden="true"></div>
+      </div>
+      <div class="tech-name">Action Cut</div>
+      <div class="cap-divider" aria-hidden="true"></div>
+      <div class="tech-desc">Joins multiple angles of continuous motion, emphasizing energy and dynamic movement.</div>
+    </div>
+  </div>
+</div>
+
+  </section>
+ 
+  <!-- 📸 모달 -->
+  <div id="cut-modal" class="photo-modal" aria-hidden="true">
+
+    <!-- X (화면 우상단 고정) -->
+    <button class="pm-close" aria-label="Close">×</button>
+
+    <!-- 좌우 화살표: 중앙 라인 배치 (SVG 아이콘) -->
+    <div class="pm-nav" aria-hidden="false">
+      <button id="pm-prev" class="arrow-btn" aria-label="Previous">
+        <svg class="arrow-icon" viewBox="0 0 30 24" aria-hidden="true" focusable="false">
+          <line x1="24" y1="12" x2="6"  y2="12" />
+          <polyline points="12 6 6 12 12 18" />
+        </svg>
+      </button>
+      <button id="pm-next" class="arrow-btn" aria-label="Next">
+        <svg class="arrow-icon" viewBox="0 0 30 24" aria-hidden="true" focusable="false">
+          <line x1="6"  y1="12" x2="24" y2="12" />
+          <polyline points="18 6 24 12 18 18" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="pm-content">
+      <video id="pm-video" controls playsinline></video>
+      <div class="pm-title"></div>
+      <div class="pm-desc"></div>
+    </div>
+  </div>
+ 
+
+  <section class="composition-section" id="composition-section">
+    <div class="composition-inner">
+
+      <div class="hr-wrap" aria-hidden="true"><div class="hr-line"></div></div>
+
+      <div class="title-block">
+        <div class="ep">episode.3</div>
+        <h1 class="title">Photographic Composition</h1>
+      </div>
+
+      <div class="hero-media">
+        <img src="photo/composition6.jpg" alt="Photographic Composition – wide example" />
+      </div>
+
+      <div class="desc">
+        <p>
+          Photographic composition is the deliberate arrangement of visual elements within a frame to guide attention
+          and create meaning. Through balance, proportion, rhythm, and visual hierarchy, composition shapes how a viewer
+          reads an image—what they notice first, how their eye travels, and what emotional weight the picture carries.
+          It is the design logic of seeing.
+        </p>
+      </div>
+
+      <!-- ✅ 교체된 3열 카드 -->
+      <div class="tri-grid" role="list">
+        <figure class="tri-card" role="listitem">
+          <img src="photo/composition7.jpg" alt="Square" />
+          <figcaption class="tri-caption">
+            <span class="cap-title">Square</span>
+            Use a near-square frame or square-bound subjects to emphasize solidity and calm, keeping weight centered and contained.
+          </figcaption>
+        </figure>
+        <figure class="tri-card" role="listitem">
+          <img src="photo/composition8.jpg" alt="V-shape" />
+          <figcaption class="tri-caption">
+            <span class="cap-title">V-shape</span>
+            Let two edges or lines meet in a V to funnel attention toward the junction, adding direction and a sense of arrival.
+          </figcaption>
+        </figure>
+        <figure class="tri-card" role="listitem">
+          <img src="photo/composition9.jpg" alt="Split Screen" />
+          <figcaption class="tri-caption">
+            <span class="cap-title">Split Screen</span>
+            Divide the frame into two contrasting fields to compare time, space, or action—creating tension and dialogue on one canvas.
+          </figcaption>
+        </figure>
+      </div>
+
+      <!-- Zigzag list -->
+      <div class="zigzag">
+        <!-- 1 -->
+        <div class="zig-item">
+          <div class="media-box" data-video="video/composition1.mp4">
+            <img src="photo/composition1.jpg" alt="Horizontal line" />
+            <video preload="metadata" muted playsinline></video>
+          </div>
+          <div class="zig-text">
+            <h4>Horizontal line</h4>
+            <p>Anchor a strong horizontal—like a horizon or architectural band—to express stability, calm, and a grounded sense of space.</p>
+          </div>
+        </div>
+        <!-- 2 -->
+        <div class="zig-item">
+          <div class="zig-text">
+            <h4>Radiating</h4>
+            <p>Let lines or textures emanate from a point to draw the eye outward, creating energy, direction, and visual emphasis.</p>
+          </div>
+          <div class="media-box" data-video="video/composition2.mp4">
+            <img src="photo/composition2.jpg" alt="Radiating" />
+            <video preload="metadata" muted playsinline></video>
+          </div>
+        </div>
+        <!-- 3 -->
+        <div class="zig-item">
+          <div class="media-box" data-video="video/composition3.mp4">
+            <img src="photo/composition3.jpg" alt="Diagonal" />
+            <video preload="metadata" muted playsinline></video>
+          </div>
+          <div class="zig-text">
+            <h4>Diagonal</h4>
+            <p>Set key elements on a slanted axis to suggest motion and depth—guiding the gaze from corner to corner with gentle tension.</p>
+          </div>
+        </div>
+        <!-- 4 -->
+        <div class="zig-item">
+          <div class="zig-text">
+            <h4>Side V</h4>
+            <p>Form a V from the frame’s sides so both edges converge toward a focal point, balancing two flanks and channeling attention.</p>
+          </div>
+          <div class="media-box" data-video="video/composition4.mp4">
+            <img src="photo/composition4.jpg" alt="Side V" />
+            <video preload="metadata" muted playsinline></video>
+          </div>
+        </div>
+        <!-- 5 -->
+        <div class="zig-item">
+          <div class="media-box" data-video="video/composition5.mp4">
+            <img src="photo/composition5.jpg" alt="Circular" />
+            <video preload="metadata" muted playsinline></video>
+          </div>
+          <div class="zig-text">
+            <h4>Circular</h4>
+            <p>Use arcs and loops to circulate the viewer’s eye around the subject, enclosing interest and creating cohesive balance.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom line -->
+      <div class="section-end">
+        <div class="hr-wrap" aria-hidden="true"><div class="hr-line"></div></div>
+      </div>
+
+    </div>
+  </section>
+
+
+
+
+<section class="light-section" id="light2-section">
+  <video
+    class="light-video"
+    src="video/light.mp4"
+    autoplay
+    muted
+    loop
+    playsinline
+  ></video>
+ 
+</section>
+
+
+
+
+ <section class="light2-section"  >
+  <!-- 왼쪽 고정 사진 -->
+ <div class="light2-left-photo">
+  <img id="light2-img-a" class="fade-img show" src="photo/light1.jpg" alt="Light Photo layer A">
+  <img id="light2-img-b" class="fade-img"      src="photo/light1.jpg" alt="Light Photo layer B" aria-hidden="true">
+</div>
+
+  <!-- 오른쪽 영상 리스트 -->
+<!-- 오른쪽 영상 리스트 (updated) -->
+<div class="light2-right">
+  <div class="light2-card">
+    <div class="light2-media">
+      <video src="video/light1.mp4" muted playsinline></video>
+      <button class="light2-play-overlay" aria-label="Play"><span class="triangle"></span></button>
+    </div>
+    <div class="light2-title">Shimmering Light on Water</div>
+    <div class="light2-desc">Micro-specular reflections dancing on moving water, adding lively texture and motion cues. Achieve with a raking hard source and subtle surface ripples.</div>
+  </div>
+
+  <div class="light2-card">
+    <div class="light2-media">
+      <video src="video/light2.mp4" muted playsinline></video>
+      <button class="light2-play-overlay" aria-label="Play"><span class="triangle"></span></button>
+    </div>
+    <div class="light2-title">Flickering Light</div>
+    <div class="light2-desc">Irregular intensity shifts that suggest fire, neon, or unstable power. Builds tension and realism—simulate with dimmers, gag flicker boxes, or randomized gobos.</div>
+  </div>
+
+  <div class="light2-card">
+    <div class="light2-media">
+      <video src="video/light3.mp4" muted playsinline></video>
+      <button class="light2-play-overlay" aria-label="Play"><span class="triangle"></span></button>
+    </div>
+    <div class="light2-title">Lens Flare</div>
+    <div class="light2-desc">Stray light scattering through lens elements to create halos and streaks. Conveys heat, scale, or stylization—control with backlight angle, aperture, and matte flags.</div>
+  </div>
+
+  <div class="light2-card">
+    <div class="light2-media">
+      <video src="video/light4.mp4" muted playsinline></video>
+      <button class="light2-play-overlay" aria-label="Play"><span class="triangle"></span></button>
+    </div>
+    <div class="light2-title">Magic Hour</div>
+    <div class="light2-desc">Warm, soft light around sunrise/sunset with long shadows and gentle contrast. Shoot ~20–30 minutes around golden hour for rich color separation.</div>
+  </div>
+
+  <div class="light2-card">
+    <div class="light2-media">
+      <video src="video/light5.mp4" muted playsinline></video>
+      <button class="light2-play-overlay" aria-label="Play"><span class="triangle"></span></button>
+    </div>
+    <div class="light2-title">Gleam / Specular Highlight</div>
+    <div class="light2-desc">Tight, high-intensity reflections on glossy surfaces that define form and material. Use a small hard source near camera axis to carve edges and add sparkle.</div>
+  </div>
+</div>
+
+
+
+
+</section>
+
+
+<section class="color-section"  id="color-section" >
+  <video
+  class="color-video"
+  autoplay
+  muted
+  loop
+  playsinline
+></video>
+
+  <!-- 화살표 버튼 추가 -->
+  <div class="nav color-nav">
+    <button class="arrow-btn">
+      <svg class="arrow-icon" viewBox="0 0 30 24">
+        <line x1="24" y1="12" x2="4" y2="12" />
+        <polyline points="10 6 4 12 10 18" />
+      </svg>
+    </button>
+
+    <button class="arrow-btn">
+      <svg class="arrow-icon" viewBox="0 0 30 24">
+        <line x1="6" y1="12" x2="26" y2="12" />
+        <polyline points="20 6 26 12 20 18" />
+      </svg>
+    </button>
+  </div>
+
+  <div class="color-indicators">
+  <div class="dot active"></div>
+  <div class="dot"></div>
+  <div class="dot"></div>
+  <div class="dot"></div>
+  <div class="dot"></div>
+</div>
+
+</section>
+
+
+<section class="color2-section" id="color2">
+  <div class="color2-wrap">
+    <img class="color2-image" src="photo/color1.jpg" alt="Color grading reference" />
+    <div class="color2-overlay">
+      <div class="color2-sub unna-regular">
+        Color Correction is the next process of creatively<br>
+        adjusting the color according to the director's <br>
+         intention and the atmosphere of the scene.
+      </div>
+    </div>
+  </div>
+</section>
+
+
+ 
+
+
+<!-- 1: Green Tone -->
+  <section class="color3-section unna-regular" id="color3-1">
+    <h3 class="tone-about">ABOUT</h3> <!-- 👈 박스 위쪽 여백에 ABOUT -->
+    <div class="color3-section-content">
+      <article class="tone-box">
+        <h2 class="tone-title">Green Tone</h2>
+        <p class="tone-desc">
+          A grading style that applies a greenish cast to create a calm, cold, and distant mood. 
+          Often used to suggest alienation, detachment, or urban cynicism.
+        </p>
+        <p class="tone-examples">
+          Examples — <em>The Matrix</em> (1999), <em>Amélie</em> (2001), <em>Oldboy</em> (2003)
+        </p>
+      </article>
+      <div class="tone-video-wrap">
+        <video class="tone-video" src="video/Tone1.mp4" autoplay loop muted playsinline></video>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2: Retro Tone -->
+  <section class="color3-section reverse unna-regular" id="color3-2">
+    <div class="color3-section-content">
+      <article class="tone-box">
+        <h2 class="tone-title">Retro Tone</h2>
+        <p class="tone-desc">
+          Uses muted warm colors, faded contrast, and film grain to evoke nostalgia 
+          and the feeling of past decades.
+        </p>
+        <p class="tone-examples">
+          Examples — <em>Super 8</em> (2011), <em>Licorice Pizza</em> (2021), <em>Once Upon a Time in Hollywood</em> (2019)
+        </p>
+      </article>
+      <div class="tone-video-wrap">
+        <video class="tone-video" src="video/Tone2.mp4" autoplay loop muted playsinline></video>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3: Bleach Bypass -->
+  <section class="color3-section unna-regular" id="color3-3">
+    <div class="color3-section-content">
+      <article class="tone-box">
+        <h2 class="tone-title">Bleach Bypass</h2>
+        <p class="tone-desc">
+          A process that retains silver in film prints, lowering saturation 
+          and increasing contrast to create a harsh, gritty aesthetic.
+        </p>
+        <p class="tone-examples">
+          Examples — <em>Saving Private Ryan</em> (1998), <em>Minority Report</em> (2002), <em>Seven</em> (1995)
+        </p>
+      </article>
+      <div class="tone-video-wrap">
+        <video class="tone-video" src="video/Tone3.mp4" autoplay loop muted playsinline></video>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4: Teal & Orange -->
+  <section class="color3-section reverse unna-regular" id="color3-4">
+    <div class="color3-section-content">
+      <article class="tone-box">
+        <h2 class="tone-title">Teal &amp; Orange</h2>
+        <p class="tone-desc">
+          Separates skin tones into warm oranges while pushing shadows into teal, 
+          creating strong complementary contrast and cinematic clarity.
+        </p>
+        <p class="tone-examples">
+          Examples — <em>Transformers</em> (2007), <em>Mad Max: Fury Road</em> (2015), <em>Pacific Rim</em> (2013)
+        </p>
+      </article>
+      <div class="tone-video-wrap">
+        <video class="tone-video" src="video/Tone4.mp4" autoplay loop muted playsinline></video>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5: Pastel Tone -->
+  <section class="color3-section unna-regular" id="color3-5">
+    <div class="color3-section-content">
+      <article class="tone-box">
+        <h2 class="tone-title">Pastel Tone</h2>
+        <p class="tone-desc">
+          Employs soft, low-saturation pastel palettes to build a dreamy, 
+          romantic, or whimsical atmosphere.
+        </p>
+        <p class="tone-examples">
+          Examples — <em>The Grand Budapest Hotel</em> (2014), <em>Moonrise Kingdom</em> (2012), <em>Call Me by Your Name</em> (2017)
+        </p>
+      </article>
+      <div class="tone-video-wrap">
+        <video class="tone-video" src="video/Tone5.mp4" autoplay loop muted playsinline></video>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6: Black & White -->
+  <section class="color3-section reverse unna-regular" id="color3-6">
+    <div class="color3-section-content">
+      <article class="tone-box">
+        <h2 class="tone-title">Black &amp; White</h2>
+        <p class="tone-desc">
+          Removes color entirely, focusing attention on light, shadow, 
+          composition, and texture. Often used for symbolism or timelessness.
+        </p>
+        <p class="tone-examples">
+          Examples — <em>Schindler’s List</em> (1993), <em>The Lighthouse</em> (2019), <em>Pleasantville</em> (1998, partial B&amp;W)
+        </p>
+      </article>
+      <div class="tone-video-wrap">
+        <video class="tone-video" src="video/Tone6.mp4" autoplay loop muted playsinline></video>
+      </div>
+    </div>
+  </section>
+
+
+
+
+  <section class="camera-section" id="camera-section">
+  <div class="camera-wrap">
+    <div class="stage-outer">
+      <div class="stage" id="stage" title="Click to shoot after 3s countdown">
+        <video id="cam" playsinline muted></video>
+
+        <div class="letterbox" aria-hidden="true"></div>
+
+        <div class="tint" id="tint"></div>
+        <div class="subtitle" id="subtitle" aria-live="polite"></div>
+        <div class="shutter-btn" aria-hidden="true"><img class="shutter-icon" src="icon/camera.png" alt=""></div>
+
+        <div class="starter" id="starter">
+          <div class="starter-inner">
+            <!-- 힌트 문구 제거 -->
+            <button type="button" class="start-btn" id="startBtn">Start Camera</button>
+          </div>
+        </div>
+
+        <div class="countdown" id="countdown"><div class="num" id="countNum">3</div></div>
+        <div class="flash" id="flash"></div>
+      </div>
+
+      <!-- ▶ 각진 미니 썸네일 + 진행 카운트 -->
+      <div class="shot-indicator" id="shotIndicator" aria-label="Shots taken">
+        <span class="shot-count" id="shotCount">0/4</span>
+        <div class="thumb"><span class="num">1</span></div>
+        <div class="thumb"><span class="num">2</span></div>
+        <div class="thumb"><span class="num">3</span></div>
+        <div class="thumb"><span class="num">4</span></div>
+      </div>
+    </div>
+
+    <aside class="sidebar">
+      <div class="label">Filter</div>
+      <div class="genre-grid" id="genreGrid">
+        <div class="btn" data-genre="action">Action</div>
+        <div class="btn" data-genre="romance">Romance</div>
+        <div class="btn" data-genre="comedy">Comedy</div>
+        <div class="btn" data-genre="sf">SF</div>
+        <div class="btn" data-genre="thriller">Thriller</div>
+        <div class="btn" data-genre="retro">Retro</div>
+        <div class="btn" data-genre="bw">B&amp;W</div>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<canvas id="captureCanvas" style="display:none;"></canvas>
+
+<div class="result-overlay" id="resultOverlay" aria-modal="true" role="dialog">
+  <div class="rs-wrap">
+    <!-- 좌측 스킨 스위처 (4개) -->
+    <div class="style-switcher" id="styleSwitcher">
+      <button type="button" class="style-btn is-active" data-skin="frame1">Frame1</button>
+      <button type="button" class="style-btn" data-skin="frame2">Frame2</button>
+      <button type="button" class="style-btn" data-skin="frame3">Frame3</button>
+      <button type="button" class="style-btn" data-skin="frame4">Frame4</button>
+    </div>
+
+    <div class="rs-top"><button type="button" class="rs-close" id="closeOverlay" aria-label="Close">✕</button></div>
+
+    <!-- 시작은 항상 Basic + Frame1 -->
+    <div class="frame frame--basic-fixed" id="frameBox">
+      <div class="frame-inner" id="frameInner">
+        <div class="rs-grid layout-basic-fixed" id="resultGrid"></div>
+      </div>
+    </div>
+
+    <!-- 하단 모드 버튼 (하단 중앙 고정) -->
+    <div class="rs-bottom">
+      <div class="mode-bar" id="modeBar">
+        <button type="button" class="mode-btn is-active" data-mode="basic">Basic</button>
+        <button type="button" class="mode-btn" data-mode="grid2x2">2×2 (Landscape)</button>
+        <button type="button" class="mode-btn" data-mode="strip">Strip (Landscape)</button>
+      </div>
+    </div>
+
+    <!-- 우하단 다운로드: JPG만 -->
+    <div class="rs-download">
+      <button type="button" class="dl-btn" id="downloadJPGBtn">Download JPG</button>
+    </div>
+  </div>
+</div>
+
+
+
+
+<!-- html2canvas -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script>
+
+
+
+
+// 공통 헬퍼
+function scrollToSection(el) {
+  if (!el) return;
+  window.scrollTo({ top: el.offsetTop, behavior: 'auto' }); // 원하면 'smooth'
+}
+
+
+document.getElementById('toindex')?.addEventListener('click', () => { /* ... */ });
+document.getElementById('toCut')?.addEventListener('click', () => { /* ... */ });
+document.getElementById('toFrame')?.addEventListener('click', () => { /* ... */ });
+document.getElementById('toLight')?.addEventListener('click', () => { /* ... */ });
+document.getElementById('toColor')?.addEventListener('click', () => { /* ... */ });
+document.getElementById('toCamera')?.addEventListener('click', () => { /* ... */ });
+
+   
+
+// 안전 바인딩: 버튼/타겟이 실제 있을 때만 이벤트 연결
+(() => {
+  const targets = {
+    toCut:   document.querySelector('.cut-section'),
+    toindex: document.querySelector('.index-section'),
+    toFrame: document.querySelector('.composition-section'),
+    toLight: document.querySelector('.light-section'),
+    toColor: document.querySelector('.color-section'),
+    toCamera: document.getElementById('cameraSection'),
+  };
+
+  Object.entries(targets).forEach(([id, target]) => {
+    const btn = document.getElementById(id);
+    if (!btn || !target) return;
+    btn.addEventListener('click', () => {
+      window.scrollTo({ top: target.offsetTop, behavior: 'auto' });
+    });
+  });
+})();
+
+
+    
+
+// ✅ person 썸네일 클릭 모달 (새 구조: .grid-card + data-title)
+document.addEventListener("DOMContentLoaded", () => {
+  const modal      = document.getElementById('photo-modal');
+  const modalImage = document.getElementById('modal-image');
+  const modalTitle = document.getElementById('modal-title');
+  const modalDesc  = document.getElementById('modal-desc');
+  const closeBtn   = document.getElementById('close-btn');
+  const nextBtn    = document.getElementById('next');
+  const prevBtn    = document.getElementById('prev');
+
+  /* ⬇ 상단 UI 버튼 참조 */
+  const timelogBtn = document.getElementById('timelogBtn');
+  const menuBtn    = document.getElementById('menuBtn');
+
+  /* ⬇ 보여줄/숨길 때 토글 함수 */
+  function hideTopUI(hide = true){
+    [timelogBtn, menuBtn].forEach(el => el && el.classList.toggle('ui-hide', hide));
+  }
+
+  const fileMap = {
+    "Extreme Long Shot": "Extreme long shot",
+    "Long Shot": "Long shot",
+    "Full Shot": "Full shot",
+    "Knee Shot": "Knee shot",
+    "Waist Shot": "Waist shot",
+    "Bust Shot": "Bust shot",
+    "Close Up": "Close up",
+    "Extreme Close Up": "Extreme close up"
+  };
+
+  const descriptions = {
+    "Extreme Long Shot": "인물이 배경 속에 작게 표현되어\n장소나 분위기를 강조할 때 사용",
+    "Long Shot": "전신이 화면에 담기며 주변과의 관계를 드러냄",
+    "Full Shot": "인물의 전신이 프레임에 꽉 차게 표현됨",
+    "Knee Shot": "무릎 위까지 보여주며 자연스러운 대화에 사용됨",
+    "Waist Shot": "허리 위를 보여주며 인물 중심의 장면에 적합",
+    "Bust Shot": "가슴 위로 클로즈업되어 표정 강조에 용이",
+    "Close Up": "얼굴 전체를 클로즈업해 감정 전달에 집중",
+    "Extreme Close Up": "눈, 입 등 세부 부위를 강조하여 극도의 감정 표현"
+  };
+
+  let currentSet = [];
+  let currentIndex = 0;
+
+  // ▶ 새 구조: .grid-card(data-title) 안의 img 클릭
+  document.querySelectorAll('.person-section .frame-scroll-right .grid-card').forEach(card => {
+    const img = card.querySelector('img');
+    const title = card.dataset.title?.trim();
+    if (!img || !title) return;
+
+    img.addEventListener('click', () => {
+      const baseName = fileMap[title] || "";
+      if (!baseName) return;
+
+      currentSet = (title === "Extreme Long Shot" || title === "Extreme Close Up")
+        ? [1, 2].map(i => `person/${baseName}${i}.jpg`)
+        : [1, 2, 3, 4].map(i => `person/${baseName}${i}.jpg`);
+
+      currentIndex = 0;
+      modalImage.src = currentSet[currentIndex];
+      modalTitle.textContent = title;
+      modalDesc.textContent  = descriptions[title] || "";
+
+      /* ⬇ 모달 열 때 상단 UI 숨김 */
+      hideTopUI(true);
+      
+      
+
+      modal.classList.remove('hidden');
+
+
+      modal.classList.remove('hidden');
+  lockScroll();   // ✅ 스크롤 잠금 추가
+ });
+  });
+
+  // ▶ 네비게이션
+  nextBtn.onclick = () => {
+    if (!currentSet.length) return;
+    currentIndex = (currentIndex + 1) % currentSet.length;
+    modalImage.src = currentSet[currentIndex];
+  };
+  prevBtn.onclick = () => {
+    if (!currentSet.length) return;
+    currentIndex = (currentIndex - 1 + currentSet.length) % currentSet.length;
+    modalImage.src = currentSet[currentIndex];
+  };
+
+ // ▶ 닫기 (X 버튼)
+closeBtn.onclick = () => {
+  modal.classList.add('hidden');
+  hideTopUI(false);
+  unlockScroll(); // ✅ 스크롤 해제
+};
+
+// ▶ 오버레이 클릭 닫기
+modal.addEventListener('click', (e) => {
+  if (e.target === modal) {
+    modal.classList.add('hidden');
+    hideTopUI(false);
+    unlockScroll(); // ✅ 스크롤 해제
+  }
+});
+
+// ▶ ESC 닫기
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+    modal.classList.add('hidden');
+    hideTopUI(false);
+    unlockScroll(); // ✅ 스크롤 해제
+  }
+});
+});
+
+
+
+const colorVideo = document.querySelector('.color-video');
+const colorDots = document.querySelectorAll('.color-indicators .dot');
+const colorLeftBtn = document.querySelectorAll('.color-nav .arrow-btn')[0];
+const colorRightBtn = document.querySelectorAll('.color-nav .arrow-btn')[1];
+
+const colorVideoSources = [
+  "video/color1.mp4",
+  "video/color2.mp4",
+  "video/color3.mp4",
+  "video/color4.mp4",
+  "video/color5.mp4"
+];
+
+let currentColorIndex = 0;
+
+function updateColorVideo(index) {
+  colorVideo.src = colorVideoSources[index];
+  colorVideo.play();
+
+  colorDots.forEach((dot, i) => {
+    dot.classList.toggle('active', i === index);
+  });
+}
+
+colorLeftBtn.addEventListener('click', () => {
+  currentColorIndex = (currentColorIndex - 1 + colorVideoSources.length) % colorVideoSources.length;
+  updateColorVideo(currentColorIndex);
+});
+
+colorRightBtn.addEventListener('click', () => {
+  currentColorIndex = (currentColorIndex + 1) % colorVideoSources.length;
+  updateColorVideo(currentColorIndex);
+});
+
+updateColorVideo(0); // 첫 영상 강제 로드
+
+
+
+const leftPhoto = document.querySelector('.person-left-photo');
+const personSection = document.querySelector('.person-section');
+const light2Photo = document.querySelector('.light2-left-photo');
+const light2SectionEl = document.querySelector('.light2-section');
+
+/* ===== light2 왼쪽 사진: 스크롤 진행도에 따른 3단계 이미지 전환 (크로스페이드) ===== */
+const LIGHT2_SOURCES = [
+  'photo/light1.jpg', // 섹션 초반
+  'photo/light2.jpg', // 섹션 중간
+  'photo/light3.jpg'  // 섹션 후반
+];
+
+// 레이어 참조
+const _l2ImgA = document.getElementById('light2-img-a');
+const _l2ImgB = document.getElementById('light2-img-b');
+
+// 상태
+let _l2CurrentIdx = 0;   // 0→1→2
+let _l2FrontIsA   = true; // 어떤 레이어가 앞(보이는 상태)인지
+
+// 미리 로드(페이드 시 깜빡임 방지)
+LIGHT2_SOURCES.slice(1).forEach(src => { const im = new Image(); im.src = src; });
+
+function _l2CrossfadeTo(src) {
+  const front = _l2FrontIsA ? _l2ImgA : _l2ImgB; // 현재 보이는 레이어
+  const back  = _l2FrontIsA ? _l2ImgB : _l2ImgA; // 뒤 레이어(다음 그림을 올림)
+
+  if (!back) return;
+
+  // 같은 src로 중복 전환 방지
+  if (back.src && back.src.endsWith(src)) {
+    // 뒤 레이어에 이미 같은 이미지가 올라가 있으면 단순 토글
+  } else {
+    back.src = src;
+  }
+
+  // 페이드
+  back.classList.add('show');
+  front?.classList.remove('show');
+
+  // 다음에 반대로 사용
+  _l2FrontIsA = !_l2FrontIsA;
+}
+
+function updateLight2PhotoByScroll() {
+  if (!light2SectionEl || !_l2ImgA || !_l2ImgB) return;
+
+  const sectionTop    = light2SectionEl.offsetTop;
+  const sectionHeight = light2SectionEl.offsetHeight;
+  const vh            = window.innerHeight;
+  const scrollY       = window.scrollY;
+
+  // 섹션의 스크롤 가능한 범위(고정 이미지 컨텍스트)
+  const maxScroll = Math.max(1, sectionHeight - vh);
+  let p = (scrollY - sectionTop) / maxScroll; // 0~1
+  p = Math.max(0, Math.min(1, p));
+
+  // 3단계 구간을 간단히 분할: [0~0.33), [0.33~0.66), [0.66~1]
+  let idx = 0;
+  if (p >= 0.66)      idx = 2;
+  else if (p >= 0.33) idx = 1;
+
+  if (idx !== _l2CurrentIdx) {
+    _l2CurrentIdx = idx;
+    _l2CrossfadeTo(LIGHT2_SOURCES[idx]);
+  }
+}
+
+
+function handleLeftPhotoPosition() {
+  const sectionTop = personSection.offsetTop;
+  const sectionHeight = personSection.offsetHeight;
+  const photoHeight = leftPhoto.offsetHeight;
+  const scrollY = window.scrollY;
+
+  // 섹션 시작 전 → 숨김
+  if (scrollY < sectionTop) {
+    leftPhoto.style.position = 'absolute';
+    leftPhoto.style.top = '0px';
+  }
+  // 섹션 안에 있을 때 → fixed
+  else if (scrollY >= sectionTop && scrollY < sectionTop + sectionHeight - photoHeight) {
+    leftPhoto.style.position = 'fixed';
+    leftPhoto.style.top = '0px';
+  }
+  // 섹션 끝에 도달하면 → absolute로 고정 해제
+  else {
+    leftPhoto.style.position = 'absolute';
+    leftPhoto.style.top = `${sectionHeight - photoHeight}px`;
+  }
+}
+
+function handleAll() {
+  // person 왼쪽 사진 (기존)
+  handleLeftPhotoPosition();
+  toggleLeftPhotoVisibility();
+
+   // ✅ person 고정 사진 "콘텐츠" 전환 (신규)
+  updatePersonPhotoByScroll();
+
+  // light2 왼쪽 사진 (신규)
+  handleLight2LeftPhotoPosition();
+  toggleLight2LeftPhotoVisibility();
+
+   // light2 왼쪽 사진 "콘텐츠" 전환 (신규)
+  updateLight2PhotoByScroll();  
+}
+
+// 기존 handleLeftPhotoPosition만 연결한 리스너 대신
+window.addEventListener('scroll', handleAll, { passive: true });
+window.addEventListener('resize', handleAll);
+window.addEventListener('load', handleAll);
+document.addEventListener('DOMContentLoaded', handleAll);
+
+
+function toggleLeftPhotoVisibility() {
+  const sectionTop = personSection.offsetTop;
+  const sectionBottom = sectionTop + personSection.offsetHeight;
+  const scrollTop = window.scrollY;
+  const vh = window.innerHeight;
+
+  // 화면과 섹션이 교차하면 보여주기
+  const intersects = (scrollTop + vh > sectionTop) && (scrollTop < sectionBottom);
+  leftPhoto.classList.toggle('is-shown', intersects);
+}
+
+
+function handleLight2LeftPhotoPosition() {
+  if (!light2Photo || !light2SectionEl) return;
+
+  const sectionTop = light2SectionEl.offsetTop;
+  const sectionHeight = light2SectionEl.offsetHeight;
+  const photoHeight = light2Photo.offsetHeight;
+  const scrollY = window.scrollY;
+
+  if (scrollY < sectionTop) {
+    light2Photo.style.position = 'absolute';
+    light2Photo.style.top = '0px';
+  } else if (scrollY >= sectionTop && scrollY < sectionTop + sectionHeight - photoHeight) {
+    light2Photo.style.position = 'fixed';
+    light2Photo.style.top = '0px';
+  } else {
+    light2Photo.style.position = 'absolute';
+    light2Photo.style.top = `${sectionHeight - photoHeight}px`;
+  }
+}
+
+function toggleLight2LeftPhotoVisibility() {
+  if (!light2Photo || !light2SectionEl) return;
+
+  const sectionTop = light2SectionEl.offsetTop;
+  const sectionBottom = sectionTop + light2SectionEl.offsetHeight;
+  const scrollTop = window.scrollY;
+  const vh = window.innerHeight;
+
+  const intersects = (scrollTop + vh > sectionTop) && (scrollTop < sectionBottom);
+  light2Photo.classList.toggle('is-hidden', !intersects); // 섹션 밖이면 숨김
+}
+
+
+// ✅ light2: 카드 안에서는 재생하지 않음. 버튼 클릭 시 모달로 띄워서 재생 + 화살표 네비게이션
+window.addEventListener('DOMContentLoaded', () => {
+  const vModal = document.getElementById('video-modal');
+  const vPlayer = document.getElementById('vm-player');
+  const vClose  = vModal.querySelector('.vm-close');
+
+  // light2 영상 전체 목록 저장
+  const light2Videos = Array.from(document.querySelectorAll('.light2-card video'))
+                            .map(v => v.currentSrc || v.src);
+  let currentLight2Index = 0;
+
+  function openVideoModal(index) {
+    currentLight2Index = index;
+    vPlayer.src = light2Videos[currentLight2Index];
+    vPlayer.muted = true;
+    vModal.classList.add('visible');
+    document.body.style.overflow = 'hidden';
+    toggleTopUI(true);
+    vPlayer.play().catch(() => {});
+  }
+
+  function closeVideoModal() {
+    try { vPlayer.pause(); } catch(e){}
+    vPlayer.removeAttribute('src');
+    vPlayer.load();
+    vModal.classList.remove('visible');
+    document.body.style.overflow = '';
+    toggleTopUI(false);
+  }
+
+
+  // 상단 UI(타임로그/메뉴) 보이기/숨기기 공용 함수
+function toggleTopUI(hide) {
+  document.getElementById('timelogBtn')?.classList.toggle('ui-hide', hide);
+  document.getElementById('menuBtn')?.classList.toggle('ui-hide', hide);
+}
+
+
+  function showPrevVideo() {
+    currentLight2Index = (currentLight2Index - 1 + light2Videos.length) % light2Videos.length;
+    vPlayer.src = light2Videos[currentLight2Index];
+    vPlayer.play().catch(() => {});
+  }
+
+  function showNextVideo() {
+    currentLight2Index = (currentLight2Index + 1) % light2Videos.length;
+    vPlayer.src = light2Videos[currentLight2Index];
+    vPlayer.play().catch(() => {});
+  }
+
+  // 닫기 버튼, 바깥 클릭
+  vClose.addEventListener('click', closeVideoModal);
+  vModal.addEventListener('click', (e) => {
+    if (e.target === vModal) closeVideoModal();
+  });
+
+  // 화살표 버튼 이벤트
+  document.getElementById('vm-prev').addEventListener('click', showPrevVideo);
+  document.getElementById('vm-next').addEventListener('click', showNextVideo);
+
+  // light2 카드별 클릭 이벤트 (index 기반)
+  document.querySelectorAll('.light2-card').forEach((card, index) => {
+    const playBtn = card.querySelector('.light2-play-overlay');
+    if (!playBtn) return;
+    playBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openVideoModal(index);
+    });
+  });
+
+  // ESC로 닫기
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && vModal.classList.contains('visible')) {
+      vClose.click();
+    }
+  });
+});
+
+/* ===== TIMELOG INTRO (scoped) ===== */
+(function(){
+  const root = document.getElementById('timelog-intro');
+  if(!root) return;
+
+  // Elements
+  const videoContainer = root.querySelector('#tl-bg-video-container');
+  const videoCorner    = root.querySelector('#tl-video-corner');
+  const videoWrapper   = root.querySelector('#tl-video-wrapper');
+  const video          = root.querySelector('#tl-bg-video');
+  const progressBar    = root.querySelector('#tl-progress-bar');
+
+  const pov            = root.querySelector('#tl-pov');
+  const onoffToggle    = root.querySelector('#tl-onoffToggle');
+
+  const soundBtn       = root.querySelector('#tl-sound-btn');
+  const soundLabel     = root.querySelector('#tl-sound-label');
+
+  const blurOverlay    = root.querySelector('#tl-blur-overlay');
+  const mobileBgImg    = root.querySelector('.tl-mobile-bg-image img');
+
+  const sliderWrap     = root.querySelector('#tl-custom-slider');
+  const sliderTrack    = root.querySelector('#tl-slider-track');
+  const sliderThumb    = root.querySelector('#tl-slider-thumb');
+  const sliderLabel    = root.querySelector('#tl-slider-label');
+  const arrowSeq       = root.querySelector('#tl-arrow-seq');
+
+  const corners        = Array.from(root.querySelectorAll('.tl-corner'));
+
+  // State
+  let isExpanded = false;
+  let isMuted    = true;
+  let dragging   = false;
+  let percent    = 0; // 슬라이더 0~1
+
+  // Init
+  video.muted = true;
+  soundLabel.textContent = 'SOUND OFF';
+
+  // Expand & Play (public for inline onclick)
+  function expandAndPlay(){
+    // 슬라이더/라벨 숨김
+    sliderWrap.classList.add('tl-hidden');
+    sliderLabel.classList.add('tl-hidden');
+
+    if(!isExpanded){
+      corners.forEach(c => c.classList.add('expand'));
+      setTimeout(() => {
+        videoContainer.classList.add('active');
+        video.play().catch(()=>{});
+        isExpanded = true;
+
+        // 블러 제거
+        blurOverlay.classList.add('hide');
+
+        // 사운드 버튼 표시
+        soundBtn.style.display = 'block';
+
+        // 오버레이 텍스트 숨김
+        const overlayTexts = root.querySelector('.tl-video-overlay-texts');
+        if(overlayTexts) overlayTexts.classList.add('tl-hidden');
+
+        // 토글 ON
+        onoffToggle.classList.remove('off');
+        onoffToggle.classList.add('on');
+      }, 500);
+    }
+  }
+
+  // Collapse & reset
+  function collapse(){
+    // 슬라이더/라벨 다시 표시
+    sliderWrap.classList.remove('tl-hidden');
+    sliderLabel.classList.remove('tl-hidden');
+
+    try{ video.pause(); }catch(e){}
+    video.currentTime = 0;
+    videoContainer.classList.remove('active');
+    corners.forEach(c => c.classList.remove('expand'));
+    isExpanded = false;
+
+    // 블러 복귀
+    blurOverlay.classList.remove('hide');
+
+    // 사운드 버튼 숨김
+    soundBtn.style.display = 'none';
+
+    // 오버레이 텍스트 복귀
+    const overlayTexts = root.querySelector('.tl-video-overlay-texts');
+    if(overlayTexts) overlayTexts.classList.remove('tl-hidden');
+
+    onoffToggle.classList.remove('on');
+    onoffToggle.classList.add('off');
+
+    // 가이드 화살표 다시 보이기
+    arrowSeq.classList.remove('hidden');
+  }
+
+  // Progress
+  video.addEventListener('timeupdate', () => {
+    if(!video.duration) return;
+    const p = (video.currentTime / video.duration) * 100;
+    progressBar.style.width = p + '%';
+  });
+
+  // Sound
+  function toggleMute(){
+    isMuted = !isMuted;
+    video.muted = isMuted;
+    soundLabel.textContent = isMuted ? 'SOUND OFF' : 'SOUND ON';
+  }
+  soundBtn.addEventListener('click', toggleMute);
+
+  // POV (로고) 클릭 → 축소
+  pov.addEventListener('click', collapse);
+
+  // Hover enlarge (작을 때만)
+  videoContainer.addEventListener('mouseenter', () => { if(!isExpanded) videoContainer.classList.add('hovered'); });
+  videoContainer.addEventListener('mouseleave', () => { videoContainer.classList.remove('hovered'); });
+  videoWrapper.addEventListener('mouseenter', () => { if(!isExpanded) videoWrapper.classList.add('hovered'); });
+  videoWrapper.addEventListener('mouseleave', () => { videoWrapper.classList.remove('hovered'); });
+
+  // Slider drag
+  sliderThumb.addEventListener('mousedown', (e)=>{
+    dragging = true; e.preventDefault();
+    arrowSeq.classList.add('hidden'); // 드래그 시작하면 가이드 숨김
+  });
+  document.addEventListener('mouseup', ()=> dragging=false);
+  document.addEventListener('mousemove', (e)=>{
+    if(!dragging) return;
+    const rect = sliderTrack.getBoundingClientRect();
+    const r = sliderThumb.offsetWidth / 2;
+    const margin = 4;
+    const minX = r + margin;
+    const maxX = rect.width - r - margin;
+    let x = e.clientX - rect.left;
+    x = Math.max(minX, Math.min(x, maxX));
+    sliderThumb.style.left = x + 'px';
+
+    percent = (x - minX) / (maxX - minX);
+
+    // 블러(오버레이) 20 -> 0
+    const blurValue = 20 * (1 - percent);
+    blurOverlay.style.backdropFilter = `blur(${blurValue}px)`;
+    blurOverlay.style.backgroundColor = blurValue === 0 ? 'transparent' : 'rgba(255,255,255,0.1)';
+
+    // 백그라운드 이미지 블러 0 -> 20
+    const bgImageBlur = 20 * percent;
+    mobileBgImg.style.filter = `grayscale(100%) blur(${bgImageBlur}px)`;
+  });
+
+  // 공개 함수 바인딩 (inline handler용)
+  window.__timelogIntro = { expandAndPlay };
+
+  // 페이지 스크롤과의 공존:
+  // 섹션이 화면 밖으로 나가면 이 인트로의 fixed UI를 숨김(성능/충돌 방지)
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(ent=>{
+      if(ent.isIntersecting){
+        root.style.pointerEvents = '';
+        root.style.visibility = '';
+      }else{
+        // 뷰포트에서 벗어나면 (다음 섹션 보기 위해) 이 섹션 UI 가림
+        root.style.pointerEvents = 'none';
+        root.style.visibility = 'hidden';
+      }
+    });
+  }, {threshold: 0});
+  io.observe(root);
+})();
+
+
+
+
+
+/* ===== person-section 전용 ‘느린 스크롤’ 가드 ===== */
+(function () {
+  const zone = document.querySelector('.person-section');
+  if (!zone) return;
+
+  // 원하는 감속 비율(작을수록 더 느림)
+  const FACTOR = 0.38;
+
+  // 모달 열려있으면 동작 끔
+  const isModalOpen = () => {
+    const photoOpen = document.getElementById('photo-modal') && !document.getElementById('photo-modal').classList.contains('hidden');
+    const videoOpen = document.getElementById('video-modal') && document.getElementById('video-modal').classList.contains('visible');
+    return photoOpen || videoOpen;
+  };
+
+  // 지금 뷰포트가 person-section과 겹치는지 (여유 margin 포함)
+  const inZone = () => {
+    const r = zone.getBoundingClientRect();
+    const margin = 16; // 살짝 여유
+    return r.top < (window.innerHeight - margin) && r.bottom > margin;
+  };
+
+  // 스크롤 막고 감속 반영
+  const slowScroll = (dy) => {
+    window.scrollBy({ top: dy * FACTOR, left: 0, behavior: 'auto' });
+  };
+
+  /* --- 휠(마우스/트랙패드) --- */
+  const onWheel = (e) => {
+    if (isModalOpen()) return;
+    if (!inZone()) return;
+    // Ctrl/Meta(줌/특수 스크롤)일 땐 건드리지 않음
+    if (e.ctrlKey || e.metaKey) return;
+
+    e.preventDefault();
+    slowScroll(e.deltaY);
+  };
+  window.addEventListener('wheel', onWheel, { passive: false });
+
+  /* --- 키보드(↑↓PgUp PgDn Space/Home/End) --- */
+  const onKeydown = (e) => {
+    if (isModalOpen()) return;
+    if (!inZone()) return;
+
+    let step = 0;
+    const vh = window.innerHeight;
+
+    switch (e.key) {
+      case 'ArrowDown': step = 40; break;
+      case 'ArrowUp':   step = -40; break;
+      case 'PageDown':  step = 0.9 * vh; break;
+      case 'PageUp':    step = -0.9 * vh; break;
+      case ' ':         step = e.shiftKey ? -0.9 * vh : 0.9 * vh; break;
+      case 'Home':      step = -(document.documentElement.scrollTop || window.pageYOffset); break;
+      case 'End':       step = (document.documentElement.scrollHeight - window.innerHeight) - (document.documentElement.scrollTop || window.pageYOffset); break;
+      default: return; // 다른 키는 무시
+    }
+
+    e.preventDefault();
+    slowScroll(step);
+  };
+  window.addEventListener('keydown', onKeydown, { passive: false });
+
+  /* --- 터치(모바일/트랙패드 유사 제스처 보호) --- */
+  let touchY = null;
+  const onTouchStart = (e) => {
+    if (isModalOpen()) return;
+    if (!inZone()) return;
+    touchY = e.touches[0].clientY;
+  };
+  const onTouchMove = (e) => {
+    if (isModalOpen()) return;
+    if (!inZone()) return;
+    if (touchY == null) return;
+    const curr = e.touches[0].clientY;
+    const dy = touchY - curr; // 손가락 방향 반대가 스크롤 방향
+    if (Math.abs(dy) > 0) {
+      e.preventDefault();
+      slowScroll(dy);
+      touchY = curr;
+    }
+  };
+  const onTouchEnd = () => { touchY = null; };
+
+  // passive:false 필수(막을 수 있게)
+  window.addEventListener('touchstart', onTouchStart, { passive: false });
+  window.addEventListener('touchmove', onTouchMove,   { passive: false });
+  window.addEventListener('touchend', onTouchEnd,     { passive: true });
+
+  /* --- 내부 스크롤 영역 예외 처리(필요 시 추가) ---
+     현재 .person-section 내부에 별도의 세로 스크롤 컨테이너가 없어서 스킵.
+     나중에 내부에 overflow:auto 요소가 생기면, 그 요소 안에서 발생한 이벤트는 return 하도록 target.closest(...) 체크 추가하면 됨.
+  --- */
+
+  /* --- 리사이즈/레이아웃 변동에도 안전 ---
+     inZone()이 매 이벤트마다 getBoundingClientRect()를 사용하므로
+     고정/absolute 전환, 높이 변화에도 정확히 동작.
+  --- */
+})();
+
+
+// ▶ TIMELOG 버튼: index.html 페이지로 이동
+document.getElementById('timelogBtn')?.addEventListener('click', () => {
+  window.location.href = "index.html"; 
+});
+
+
+
+
+// ── 메뉴 버튼 토글 + 패널 열고 닫기 ──
+
+
+
+// "Go to Index" 버튼
+document.querySelector('.go-index-btn')?.addEventListener('click', () => {
+  const indexSection = document.querySelector('.index-section');
+  if (indexSection) {
+    window.scrollTo({ top: indexSection.offsetTop, behavior: 'smooth' });
+  }
+});
+
+
+
+// ✅ 올바른 cutModal 기반 코드
+const cutModal = document.getElementById('cut-modal');
+const pmVideo = document.getElementById('pm-video');
+const pmTitleEl = document.querySelector('.pm-title');
+const pmDescEl  = document.querySelector('.pm-desc');
+const pmClose   = document.querySelector('.pm-close');
+const prevBtn   = document.getElementById('pm-prev');
+const nextBtn   = document.getElementById('pm-next');
+const pmContent = document.querySelector('.pm-content');
+
+const cards = Array.from(document.querySelectorAll('.thumb-card'));
+let currentIndex = -1;
+
+/* =========================
+   🔒 스크롤 잠금/해제
+   ========================= */
+let __scrollY = 0;
+function lockScroll(){
+  __scrollY = window.scrollY || window.pageYOffset || 0;
+  document.body.style.position = 'fixed';
+  document.body.style.top = `-${__scrollY}px`;
+  document.body.style.left = '0';
+  document.body.style.right = '0';
+  document.body.style.width = '100%';
+  document.body.style.overflow = 'hidden';
+}
+function unlockScroll(){
+  document.body.style.position = '';
+  document.body.style.top = '';
+  document.body.style.left = '';
+  document.body.style.right = '';
+  document.body.style.width = '';
+  document.body.style.overflow = '';
+  window.scrollTo(0, __scrollY);
+}
+
+// 배경 스크롤 새는 것 방지
+function preventBGScroll(e){ e.preventDefault(); }
+function attachScrollBlock(){
+  cutModal.addEventListener('wheel', preventBGScroll, { passive:false });
+  cutModal.addEventListener('touchmove', preventBGScroll, { passive:false });
+  pmContent.addEventListener('wheel', (e)=>e.stopPropagation(), { passive:false });
+  pmContent.addEventListener('touchmove', (e)=>e.stopPropagation(), { passive:false });
+}
+function detachScrollBlock(){
+  cutModal.removeEventListener('wheel', preventBGScroll, { passive:false });
+  cutModal.removeEventListener('touchmove', preventBGScroll, { passive:false });
+  pmContent.removeEventListener('wheel', (e)=>e.stopPropagation(), { passive:false });
+  pmContent.removeEventListener('touchmove', (e)=>e.stopPropagation(), { passive:false });
+}
+
+/* =========================
+   모달 동작
+   ========================= */
+function openAt(index){
+  currentIndex = index;
+  const card = cards[currentIndex];
+  const vid = card.querySelector('.thumb-video');
+  const name = card.querySelector('.tech-name').textContent.trim();
+  const desc = card.querySelector('.tech-desc').textContent.trim();
+
+  pmVideo.src = vid.getAttribute('src');
+  pmTitleEl.textContent = name;
+  pmDescEl.textContent = desc;
+
+  cutModal.classList.add('visible');
+  lockScroll();
+  attachScrollBlock();
+  pmVideo.play().catch(()=>{});
+}
+
+function closeModal(){
+  cutModal.classList.remove('visible');
+  detachScrollBlock();
+  unlockScroll();
+  pmVideo.pause(); pmVideo.removeAttribute('src'); pmVideo.load();
+}
+
+function showPrev(){ openAt((currentIndex - 1 + cards.length) % cards.length); }
+function showNext(){ openAt((currentIndex + 1) % cards.length); }
+
+// 카드 클릭
+cards.forEach((card,i)=> card.addEventListener('click',()=>openAt(i)));
+
+// 컨트롤
+pmClose.addEventListener('click', closeModal);
+cutModal.addEventListener('click', (e)=>{ if(e.target === cutModal) closeModal(); });
+
+// 화살표
+prevBtn.addEventListener('click', (e)=>{ e.stopPropagation(); showPrev(); });
+nextBtn.addEventListener('click', (e)=>{ e.stopPropagation(); showNext(); });
+
+// 키보드
+window.addEventListener('keydown', (e)=>{
+  if(!cutModal.classList.contains('visible')) return;
+  if(e.key==='Escape') closeModal();
+  else if(e.key==='ArrowLeft') showPrev();
+  else if(e.key==='ArrowRight') showNext();
+});
+
+
+    // 메인 cut0 자동재생 보조
+    const mainVid = document.querySelector('.cut-video');
+    if(mainVid){
+      const tryPlay=()=>mainVid.play().catch(()=>{});
+      window.addEventListener('load',tryPlay,{once:true});
+      document.addEventListener('visibilitychange',tryPlay,{once:true});
+    }
+
+    /* =========================
+       스크롤 등장 애니메이션 (항상 재실행)
+       ========================= */
+    const grids = document.querySelectorAll('.thumb-grid');
+   
+
+    // 그리드 내에서 살짝 스태거(왼→오 70ms / 줄 내려갈수록 +90ms)
+    grids.forEach(grid=>{
+      const items = Array.from(grid.querySelectorAll('.thumb-card.reveal-x'));
+      items.forEach((el, idx)=>{
+        const col = idx % 3;
+        const row = Math.floor(idx / 3);
+        const delay = (col * 70) + (row * 90);
+        el.style.setProperty('--reveal-delay', `${delay}ms`);
+      });
+    });
+
+   // 1) reveal-x 아이템
+const revealItems = Array.from(document.querySelectorAll('.thumb-card.reveal-x'));
+const ioReveal = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      entry.target.classList.add('in-view');
+    } else {
+      entry.target.classList.remove('in-view');
+    }
+  });
+}, {
+  root: null,
+  threshold: 0.18,
+  rootMargin: "0px 0px -8% 0px"
+});
+revealItems.forEach(el=> ioReveal.observe(el));
+
+
+(function(){
+      const boxes = document.querySelectorAll('.media-box');
+      boxes.forEach(box => {
+        const video = box.querySelector('video');
+        const src   = box.dataset.video;
+        let loaded = false;
+        function ensureSource(){
+          if(loaded) return;
+          const source = document.createElement('source');
+          source.src = src;
+          source.type = 'video/mp4';
+          video.appendChild(source);
+          loaded = true;
+        }
+        box.addEventListener('mouseenter', () => {
+          ensureSource(); video.muted = true; video.currentTime = 0; video.loop = true; video.play().catch(()=>{});
+        });
+        box.addEventListener('mouseleave', () => {
+          if(!box.classList.contains('playing')){ video.pause(); video.currentTime = 0; }
+        });
+        box.addEventListener('click', () => {
+          ensureSource(); video.muted = true;
+          if(box.classList.contains('playing')){
+            box.classList.remove('playing'); video.pause(); video.currentTime = 0;
+          }else{
+            box.classList.add('playing'); video.loop = false; video.play().catch(()=>{});
+          }
+        });
+        video.addEventListener('ended', () => {
+          box.classList.remove('playing'); video.currentTime = 0;
+        });
+      });
+    })();
+
+/* 🔽 최상단 UI 토글 도우미 (TIMELOG / MENU) */
+function setTopUIHidden(hide){
+  const els = [
+    document.getElementById('timelogBtn'),
+    document.getElementById('menuBtn'),
+  ];
+  els.forEach(el => el && el.classList.toggle('ui-hide', hide));
+}
+
+function openAt(index){
+  currentIndex = index;
+  const card = cards[currentIndex];
+  const vid = card.querySelector('.thumb-video');
+  const name = card.querySelector('.tech-name').textContent.trim();
+  const desc = card.querySelector('.tech-desc').textContent.trim();
+
+  pmVideo.src = vid.getAttribute('src');
+  pmTitleEl.textContent = name;
+  pmDescEl.textContent = desc;
+
+  cutModal.classList.add('visible');
+  lockScroll();
+  attachScrollBlock();
+  setTopUIHidden(true);   // ✅ 상단 UI 숨김
+  pmVideo.play().catch(()=>{});
+}
+
+function closeModal(){
+  cutModal.classList.remove('visible');
+  detachScrollBlock();
+  unlockScroll();
+  setTopUIHidden(false);  // ✅ 상단 UI 다시 보이기
+  pmVideo.pause(); pmVideo.removeAttribute('src'); pmVideo.load();
+}
+
+
+/* ===== person 왼쪽 사진: 스크롤 진행도에 따른 3단계 이미지 전환 (크로스페이드) ===== */
+const PERSON_SOURCES = [
+  'person/photo1.JPG', // 섹션 초반
+  'person/photo2.jpg', // 섹션 중간
+  'person/photo3.jpg'  // 섹션 후반
+];
+
+// 레이어 참조
+const _pImgA = document.getElementById('person-img-a');
+const _pImgB = document.getElementById('person-img-b');
+
+// 상태
+let _pCurrentIdx = 0;    // 0→1→2
+let _pFrontIsA   = true; // 어떤 레이어가 앞(보이는 상태)인지
+
+// 미리 로드(페이드 시 깜빡임 방지)
+PERSON_SOURCES.slice(1).forEach(src => { const im = new Image(); im.src = src; });
+
+function _pCrossfadeTo(src) {
+  if (!_pImgA || !_pImgB) return;
+
+  const front = _pFrontIsA ? _pImgA : _pImgB; // 현재 보이는 레이어
+  const back  = _pFrontIsA ? _pImgB : _pImgA; // 다음 이미지를 올릴 레이어
+
+  // 같은 src로 중복 전환 방지
+  const backSrc = (back.getAttribute('src') || back.src || '');
+  if (!backSrc.endsWith(src)) back.src = src;
+
+  // 크로스페이드
+  back.classList.add('show');
+  front.classList.remove('show');
+
+  // 다음에 반대로 사용
+  _pFrontIsA = !_pFrontIsA;
+}
+
+function updatePersonPhotoByScroll() {
+  if (!personSection || !_pImgA || !_pImgB) return;
+
+  const sectionTop    = personSection.offsetTop;
+  const sectionHeight = personSection.offsetHeight;
+  const vh            = window.innerHeight;
+  const scrollY       = window.scrollY;
+
+  // 섹션 내 스크롤 가능 범위
+  const maxScroll = Math.max(1, sectionHeight - vh);
+  let p = (scrollY - sectionTop) / maxScroll; // 0~1
+  p = Math.max(0, Math.min(1, p));
+
+  // 3단계 분할: [0~0.33), [0.33~0.66), [0.66~1]
+  let idx = 0;
+  if (p >= 0.66)      idx = 2;
+  else if (p >= 0.33) idx = 1;
+
+  if (idx !== _pCurrentIdx) {
+    _pCurrentIdx = idx;
+    _pCrossfadeTo(PERSON_SOURCES[idx]);
+  }
+}
+
+
+(function(){
+  const btn   = document.getElementById('menuBtn');
+  const panel = document.getElementById('topNote');
+  if (!btn || !panel) return;
+
+  panel.hidden = true;
+
+  // ⬇︎ 왼쪽 고정 사진들(있으면 고정 유지)
+  const leftPhoto   = document.querySelector('.person-left-photo');
+  const light2Photo = document.querySelector('.light2-left-photo');
+
+  function freezeLeftFixed(on){
+    [leftPhoto, light2Photo].forEach(el=>{
+      if (!el) return;
+      if (on) {
+        // 현재 inline 스타일 백업
+        el.dataset._pos = el.style.position || '';
+        el.dataset._top = el.style.top || '';
+        // 메뉴 열렸을 때는 그냥 고정(안 움직이게)
+        el.style.position = 'fixed';
+        el.style.top = '0px';
+      } else {
+        // 원상복구
+        el.style.position = el.dataset._pos || '';
+        el.style.top = el.dataset._top || '';
+        delete el.dataset._pos; delete el.dataset._top;
+      }
+    });
+  }
+
+  const firstFocusable = () =>
+    panel.querySelector('.menu-item, button, [href], [tabindex]:not([tabindex="-1"])');
+
+  function openNote(){
+    btn.classList.add('open');
+    btn.setAttribute('aria-expanded', 'true');
+    panel.hidden = false;
+    requestAnimationFrame(() => panel.classList.add('show'));
+
+    // ✅ 스크롤 잠그지 말자(기존 lockScroll() 제거)
+    document.body.classList.add('menu-open');           // 메뉴 열림 플래그
+    panel.style.overscrollBehavior = 'auto';            // 패널 끝에서 페이지로 스크롤 전파
+
+    firstFocusable()?.focus();
+    document.addEventListener('mousedown', onDocDown);
+    window.addEventListener('keydown', onKey);  
+  }
+
+  function closeNote(afterClose){
+    btn.classList.remove('open');
+    btn.setAttribute('aria-expanded', 'false');
+    panel.classList.remove('show');
+
+    const onEnd = (e) => {
+      if (e.propertyName !== 'transform') return;
+      panel.hidden = true;
+      panel.removeEventListener('transitionend', onEnd);
+
+      // ✅ 스크롤 잠금 해제 로직 제거
+      document.body.classList.remove('menu-open');
+      
+
+      document.removeEventListener('mousedown', onDocDown);
+      window.removeEventListener('keydown', onKey);
+      btn.focus();
+      if (typeof afterClose === 'function') afterClose();
+    };
+    
+    panel.addEventListener('transitionend', onEnd);
+
+    // 트랜지션 꺼진 환경 대비
+    if (window.getComputedStyle(panel).transitionDuration === '0s') {
+      panel.hidden = true;
+      document.body.classList.remove('menu-open');
+      
+      document.removeEventListener('mousedown', onDocDown);
+      window.removeEventListener('keydown', onKey);
+      btn.focus();
+      if (typeof afterClose === 'function') afterClose();
+    }
+  }
+
+  function toggleNote(){
+    if (panel.classList.contains('show')) closeNote();
+    else openNote();
+  }
+  btn.addEventListener('click', toggleNote);
+
+  function onDocDown(e){
+    if (!panel.contains(e.target) && e.target !== btn) closeNote();
+  }
+  function onKey(e){
+    if (e.key === 'Escape') closeNote();
+    if (e.key === 'Tab' && panel.classList.contains('show')) {
+      const focusables = panel.querySelectorAll(
+        'button, .menu-item, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      const list = Array.from(focusables).filter(el => !el.disabled && el.offsetParent !== null);
+      if (!list.length) return;
+      const first = list[0], last = list[list.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+  }
+
+const targetMap = {
+  home:  'index.html',        
+  menu:  'film.html',               
+  index: 'index-section',        
+  cut:   'cut-section',
+  frame: 'composition-section',
+  light: 'light2-section',
+  color: 'color-section',
+  camera:'camera-section'
+};
+
+// URL 판별 헬퍼
+function isUrl(v){
+  return typeof v === 'string' && (v.includes('.html') || v.startsWith('http'));
+}
+
+panel.querySelectorAll('.menu-item[data-target]').forEach(item => {
+  item.addEventListener('click', () => {
+    const key = item.dataset.target;
+    const target = targetMap[key];
+
+    if (!target) { closeNote(); return; }
+
+    // 메뉴 닫고 나서 이동/스크롤
+    closeNote(() => {
+      // 1) index.html, film.html 같은 "다른 페이지 이동"
+      if (isUrl(target)) {
+        window.location.href = target;         // ← 같은 탭 이동
+        // window.open(target, '_blank');      // ← 새 탭으로 열고 싶으면 이 줄로 변경
+        return;
+      }
+
+      // 2) 현재 페이지 내 섹션 이동
+      const el = document.getElementById(target);
+      if (el) {
+        window.scrollTo({ top: el.offsetTop, behavior: 'auto' }); // 즉시 점프
+        // 히스토리에 해시 반영 원하면 아래 중 하나 사용:
+        // location.hash = target;                 // 히스토리에 추가
+        // history.replaceState(null,'', '#'+target); // 주소만 갱신
+      }
+    });
+  });
+});
+
+
+
+
+
+  // 메뉴 항목 클릭 후 스크롤은 기존 로직 그대로(닫힌 뒤 window.scrollTo)
+})();
+
+
+
+
+
+/* ===== 요소 ===== */
+const video=document.getElementById('cam');
+const stage=document.getElementById('stage');
+const tintEl=document.getElementById('tint');
+const subtitle=document.getElementById('subtitle');
+const start=document.getElementById('starter');
+const startBtn=document.getElementById('startBtn');
+const flash=document.getElementById('flash');
+const countdown=document.getElementById('countdown');
+const countNum=document.getElementById('countNum');
+const canvas=document.getElementById('captureCanvas');
+
+const overlay=document.getElementById('resultOverlay');
+const frameBox=document.getElementById('frameBox');
+const frameInner=document.getElementById('frameInner');
+const resultGrid=document.getElementById('resultGrid');
+const closeOverlayBtn=document.getElementById('closeOverlay');
+
+const shotIndicator=document.getElementById('shotIndicator');
+const shotCount=document.getElementById('shotCount');
+const thumbs=[...shotIndicator.querySelectorAll('.thumb')];
+
+const genreGrid=document.getElementById('genreGrid');
+const modeBar=document.getElementById('modeBar');
+const styleSwitcher=document.getElementById('styleSwitcher');
+const downloadJPGBtn=document.getElementById('downloadJPGBtn');
+
+/* ===== 상태 ===== */
+let shotDataURLs=[]; let counting=false;
+let currentGenreKey='action';
+let currentFilter={ cssFilter:'none', tint:'transparent', tintAlpha:0, blend:'normal', pipeline:'none' };
+let currentMode='basic';
+let currentSkin='frame1'; // frame1..frame4
+
+/* ===== 오디오 ===== */
+const shutterAudio = new Audio('sound/click.WAV');
+shutterAudio.preload = 'auto';
+
+/* ===== 폰트 ===== */
+async function warmFonts(){
+  if(!('fonts' in document)) return;
+  try{
+    await Promise.all([
+      document.fonts.load('16px "Oswald"'),
+      document.fonts.load('16px "Playfair Display"'),
+      document.fonts.load('16px "Fredoka"'),
+      document.fonts.load('16px "IBM Plex Mono"'),
+      document.fonts.load('16px "Cinzel"'),
+      document.fonts.load('16px "Special Elite"'),
+      document.fonts.load('16px "Lora"')
+    ]);
+  }catch(e){}
+}
+document.addEventListener('DOMContentLoaded', warmFonts);
+
+/* ===== 자막/프리셋 ===== */
+const SUBS={
+  action:{ text:'MOVE FIRST. THINK LATER.', font:'"Oswald", system-ui, sans-serif', style:'text-transform:uppercase; letter-spacing:.08em;', weight:600 },
+  romance:{ text:'In your eyes, the city turns soft.', font:'"Playfair Display", "Unna", serif', style:'font-style:italic; letter-spacing:.02em;', weight:600, italic:true },
+  comedy:{ text:'Okay—nobody panic… yet.', font:'"Fredoka", system-ui, sans-serif', style:'', weight:500 },
+  sf:{ text:'Systems online. Hold your breath.', font:'"IBM Plex Mono", ui-monospace, monospace', style:'letter-spacing:.03em;', weight:500 },
+  thriller:{ text:"Don't turn around.", font:'"Cinzel", "Unna", serif', style:'text-transform:uppercase; letter-spacing:.06em;', weight:600 },
+  retro:{ text:'This moment will look better on film.', font:'"Special Elite", "Unna", serif', style:'', weight:400 },
+  bw:{ text:'No color. Just story.', font:'"Lora", "Unna", serif', style:'font-style:italic;', weight:600, italic:true }
+};
+const PRESETS={
+  action:{ cssFilter:'contrast(1.35) saturate(1.25) brightness(1.0)', tint:'rgba(20,80,255,1)', tintAlpha:0.10, blend:'screen', pipeline:'none' },
+  romance:{ cssFilter:'contrast(1.02) saturate(1.10) brightness(1.06) hue-rotate(3deg)', tint:'rgba(255,160,190,1)', tintAlpha:0.14, blend:'soft-light', pipeline:'romanceBlush' },
+  comedy:{ cssFilter:'contrast(1.10) saturate(1.35) brightness(1.08)', tint:'rgba(255,220,60,1)', tintAlpha:0.12, blend:'overlay', pipeline:'none' },
+  sf:{ cssFilter:'contrast(1.18) brightness(0.97) saturate(1.12) hue-rotate(-6deg)', tint:'rgba(40,200,230,1)', tintAlpha:0.18, blend:'screen', pipeline:'sfNeo' },
+  thriller:{ cssFilter:'contrast(1.40) brightness(0.90) saturate(0.70)', tint:'rgba(0,255,120,1)', tintAlpha:0.08, blend:'multiply', pipeline:'none' },
+  retro:{ cssFilter:'sepia(0.55) contrast(1.12) brightness(1.00) saturate(0.95)', tint:'rgba(255,150,60,1)', tintAlpha:0.12, blend:'multiply', pipeline:'none' },
+  bw:{ cssFilter:'grayscale(1) contrast(1.20) brightness(1.05)', tint:'transparent', tintAlpha:0, blend:'normal', pipeline:'none' }
+};
+function applyPreset(preset,key){
+  currentFilter=preset; currentGenreKey=key||currentGenreKey;
+  stage.style.setProperty('--fx', preset.cssFilter);
+  tintEl.style.setProperty('--tint', preset.tint);
+  tintEl.style.setProperty('--tintAlpha', preset.tintAlpha);
+  tintEl.style.setProperty('--blend', preset.blend);
+  applySubtitle(currentGenreKey);
+}
+function applySubtitle(key){
+  const s=SUBS[key]; if(!s){ subtitle.textContent=''; return; }
+  const text=(s.style&&s.style.includes('text-transform:uppercase'))?s.text.toUpperCase():s.text;
+  subtitle.textContent=text;
+  subtitle.style.fontFamily=s.font;
+  if(s.style){
+    s.style.split(';').forEach(rule=>{
+      const [prop,val]=(rule||'').split(':').map(t=>t&&t.trim());
+      if(prop&&val) subtitle.style.setProperty(prop,val);
+    });
+  }
+}
+
+/* 카메라 */
+async function startCamera(){
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({video:true,audio:false});
+    video.srcObject=stream; await video.play();
+    start.style.display='none';
+    await warmFonts();
+    applyPreset(PRESETS.action,'action');
+    setActiveGenreBtn('action');
+  }catch(e){
+    start.innerHTML='<div style="text-align:center;padding:16px;">Camera permission was denied.<br/>Please allow it in your browser settings.</div>';
+  }
+}
+startBtn.addEventListener('click', ()=>{
+  // iOS 등 오디오 권한 선요청
+  shutterAudio.play().then(()=>{shutterAudio.pause(); shutterAudio.currentTime=0;}).catch(()=>{});
+  startCamera();
+});
+
+/* 썸네일 & 카운트 */
+function updateThumbs(){
+  shotCount.textContent=`${shotDataURLs.length}/4`;
+  thumbs.forEach((t,i)=>{
+    const img=t.querySelector('img'); const num=t.querySelector('.num');
+    if(shotDataURLs[i]){
+      if(!img){
+        const im=new Image(); im.decoding='async';
+        im.src=shotDataURLs[i]; t.innerHTML=''; t.appendChild(im);
+      }else{
+        img.src=shotDataURLs[i];
+      }
+    }else{
+      t.innerHTML=`<span class="num">${i+1}</span>`;
+    }
+  });
+}
+
+/* 필터 버튼 */
+genreGrid.addEventListener('click',(e)=>{
+  const btn=e.target.closest('.btn'); if(!btn) return;
+  const key=btn.getAttribute('data-genre'); const preset=PRESETS[key]; if(!preset) return;
+  setActiveGenreBtn(key); applyPreset(preset,key);
+});
+function setActiveGenreBtn(key){ [...genreGrid.querySelectorAll('.btn')].forEach(b=>b.classList.toggle('active', b.getAttribute('data-genre')===key)); }
+
+/* 촬영 */
+stage.addEventListener('click', ()=>{ if(!counting && overlay.style.display!=='block' && start.style.display==='none') startCountdownAndShoot(); });
+
+const STEP_MS = 900; // 각 단계 0.9s
+async function wait(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+async function startCountdownAndShoot(){
+  if(video.readyState<2) return;
+  counting=true; countdown.style.display='grid';
+  for(let n=3;n>=1;n--){
+    countNum.textContent=String(n);
+    countNum.classList.remove('countIn'); void countNum.offsetWidth; countNum.classList.add('countIn');
+    await wait(STEP_MS);
+  }
+  countdown.style.display='none'; // 1 사라지자마자 촬영
+  flash.animate([{opacity:0},{opacity:1},{opacity:0}],{duration:180,easing:'ease-out'});
+  try{ shutterAudio.currentTime=0; shutterAudio.play().catch(()=>{});}catch(e){}
+  const {dataURL}=await renderCurrentFrameToDataURL();
+  shotDataURLs.push(dataURL); updateThumbs();
+  counting=false;
+  if(shotDataURLs.length===4) openResultOverlay();
+}
+
+/* 캡처: 미러 상태 그대로 + 자막 위치 일치 */
+async function renderCurrentFrameToDataURL(){
+  const w=stage.clientWidth, h=stage.clientHeight;
+  canvas.width=w; canvas.height=h;
+  const ctx=canvas.getContext('2d',{willReadFrequently:true});
+  ctx.filter=currentFilter.cssFilter||'none';
+
+  const vw=video.videoWidth, vh=video.videoHeight;
+  const stageRatio=w/h, videoRatio=vw/vh;
+  let dw,dh,dx,dy;
+  if(videoRatio>stageRatio){ dh=h; dw=h*videoRatio; dx=(w-dw)/2; dy=0; }
+  else { dw=w; dh=w/videoRatio; dx=0; dy=(h-dh)/2; }
+
+  ctx.save();
+  ctx.translate(w,0); ctx.scale(-1,1);   // 좌우반전
+  ctx.drawImage(video,dx,dy,dw,dh);
+  ctx.restore();
+
+  if(currentFilter.tintAlpha && currentFilter.tintAlpha>0){
+    const blendable=['multiply','screen','overlay','darken','lighten','color-dodge','color-burn','hard-light','soft-light','difference','exclusion','hue','saturation','color','luminosity'];
+    ctx.globalCompositeOperation=blendable.includes(currentFilter.blend)?currentFilter.blend:'source-over';
+    ctx.globalAlpha=currentFilter.tintAlpha; ctx.fillStyle=currentFilter.tint; ctx.fillRect(0,0,w,h);
+    ctx.globalAlpha=1; ctx.globalCompositeOperation='source-over';
+  }
+  await drawSubtitleToCanvas(ctx,w,h);
+  return { dataURL: canvas.toDataURL('image/png',1.0) };
+}
+
+/* 자막 (CSS의 --subtitle-bottom과 동기화) */
+async function drawSubtitleToCanvas(ctx,w,h){
+  const s=SUBS[currentGenreKey]; if(!s) return;
+  const text=(s.style&&s.style.includes('text-transform:uppercase'))?s.text.toUpperCase():s.text;
+  const vw=Math.max(document.documentElement.clientWidth||0, window.innerWidth||0);
+  const px=Math.max(14, Math.min(20, vw*0.013)); const weight=s.weight||600; const italic=!!s.italic;
+  const primary=(s.font.match(/"[^"]+"|[^,]+/g)||['sans-serif'])[0].trim();
+  if(document.fonts && document.fonts.load){ try{ await document.fonts.load(`${italic?'italic ':''}${weight} ${px}px ${primary}`);}catch(e){} }
+  ctx.save(); ctx.textAlign='center'; ctx.textBaseline='alphabetic';
+  ctx.font=`${italic?'italic ':''}${weight} ${px}px ${primary}`; ctx.fillStyle='#fff';
+  ctx.shadowColor='rgba(0,0,0,0.6)'; ctx.shadowBlur=6; ctx.shadowOffsetX=0; ctx.shadowOffsetY=1;
+  let letterSpacingPx=0; if(s.style && /letter-spacing\s*:\s*([0-9.]+)em/i.test(s.style)){ const em=parseFloat(RegExp.$1); letterSpacingPx=em*px; }
+
+  // CSS 변수와 동일하게 72px 위
+  const SUBTITLE_BOTTOM = 72;
+  const y = h - SUBTITLE_BOTTOM;
+
+  if(letterSpacingPx>0){
+    const tmp=document.createElement('canvas').getContext('2d'); tmp.font=ctx.font;
+    let sum=0; for(const ch of text) sum+=tmp.measureText(ch).width;
+    const total=sum+letterSpacingPx*(text.length-1); let x=w/2-total/2;
+    for(const ch of text){ const mw=tmp.measureText(ch).width; ctx.fillText(ch, x+mw/2, y); x+=mw+letterSpacingPx; }
+  }else{ ctx.fillText(text, w/2, y); }
+  ctx.restore();
+}
+
+/* ===== 결과 오버레이 ===== */
+function openResultOverlay(){
+  resultGrid.innerHTML='';
+  shotDataURLs.forEach(url=>{
+    const tile=document.createElement('div');
+    tile.className='tile';
+    const img=new Image(); img.src=url;
+    tile.appendChild(img); resultGrid.appendChild(tile);
+  });
+
+  overlay.style.display='block';
+
+  /* ▶ 항상 Basic + Frame1(흰색)부터 */
+  currentMode='basic';
+  currentSkin='frame1';
+  modeBar.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('is-active'));
+  modeBar.querySelector('[data-mode="basic"]').classList.add('is-active');
+
+  styleSwitcher.querySelectorAll('.style-btn').forEach(b=>b.classList.remove('is-active'));
+  styleSwitcher.querySelector('[data-skin="frame1"]').classList.add('is-active');
+
+  setMode('basic');
+  setFrameSkin('frame1');
+
+   setTopUIHidden(true);
+}
+
+function closeAndReset(){
+  overlay.style.display='none';
+  shotDataURLs=[]; updateThumbs();
+  setTopUIHidden(false);
+}
+closeOverlayBtn.addEventListener('click', closeAndReset);
+overlay.addEventListener('click', e=>{ if(e.target===overlay) closeAndReset(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && overlay.style.display==='block') closeAndReset(); });
+
+/* 모드 전환 */
+modeBar.addEventListener('click', (e)=>{
+  const btn=e.target.closest('.mode-btn'); if(!btn) return;
+  modeBar.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('is-active'));
+  btn.classList.add('is-active'); setMode(btn.dataset.mode);
+});
+
+function setMode(mode){
+  currentMode=mode;
+
+  frameBox.className='frame';          // 초기화
+  frameInner.className='frame-inner';
+  resultGrid.className='rs-grid';
+  resultGrid.style.removeProperty('--stripH');
+
+  if(mode==='basic'){
+    frameBox.classList.add('frame--basic-fixed');
+    resultGrid.classList.add('layout-basic-fixed');
+  }else if(mode==='grid2x2'){
+    frameBox.classList.add('frame--2x2-fixed');
+    frameInner.classList.add('equal-padding');
+    resultGrid.classList.add('layout-2x2');
+  }else if(mode==='strip'){
+    frameBox.classList.add('frame--strip-fixed');
+    frameInner.classList.add('tight');
+    resultGrid.classList.add('layout-strip','tight');
+    computeStripFixedHeight();
+  }
+
+  applySkinClasses();
+}
+
+/* Strip: 타일 높이 재계산 */
+function computeStripFixedHeight(){
+  if(currentMode!=='strip') return;
+  const cs=getComputedStyle(frameInner);
+  const padV=(parseFloat(cs.paddingTop)||0)+(parseFloat(cs.paddingBottom)||0);
+  const innerH=frameBox.clientHeight - padV;
+  const tileH=Math.max(40, innerH);
+  resultGrid.style.setProperty('--stripH', `${tileH}px`);
+}
+
+/* ===== 좌측 스킨 버튼 (4개) ===== */
+styleSwitcher.addEventListener('click', (e)=>{
+  const btn=e.target.closest('.style-btn'); if(!btn) return;
+  styleSwitcher.querySelectorAll('.style-btn').forEach(b=>b.classList.remove('is-active'));
+  btn.classList.add('is-active');
+  setFrameSkin(btn.dataset.skin);
+});
+
+function setFrameSkin(skin){
+  currentSkin=skin||'frame1';
+  applySkinClasses();
+}
+
+function applySkinClasses(){
+  // 공통 초기화
+  frameBox.style.background='';
+  frameBox.classList.remove('black','film','film--perforated');
+
+  // 매핑
+  if(currentSkin==='frame1'){
+    // 흰색 (기본 .frame 배경)
+  }else if(currentSkin==='frame2'){
+    frameBox.classList.add('black'); // 검정(펀칭 없음)
+  }else if(currentSkin==='frame3'){
+    frameBox.classList.add('film','film--perforated'); // 필름 + 펀칭 (모든 모드)
+  }else if(currentSkin==='frame4'){
+    frameBox.style.background=`url('photo/camera1.jpg') center/cover no-repeat`; // 사진 프레임
+  }
+
+  if(currentMode==='strip') computeStripFixedHeight();
+}
+
+/* ===== 다운로드: JPG, 프레임/스킨 그대로 ===== */
+downloadJPGBtn.addEventListener('click', async (e)=>{
+  e.stopPropagation();
+  const dpr  = Math.max(1, window.devicePixelRatio || 1);
+  const overlayBG = getComputedStyle(overlay).backgroundColor || '#F5F4F2';
+
+  await new Promise(requestAnimationFrame);
+
+  if(typeof html2canvas!=='function' && typeof html2canvas!=='object'){
+    alert('캡처 모듈이 로드되지 않았습니다.');
+    return;
+  }
+
+  // 캡처 시 스케일 왜곡 방지: clone에서 transform 제거
+  const canvasCap = await html2canvas(frameBox, {
+    useCORS: true,
+    scale: dpr,
+    backgroundColor: overlayBG,
+    foreignObjectRendering: false,
+    onclone: (doc)=>{
+      const cloneBox = doc.getElementById('frameBox');
+      if(cloneBox) cloneBox.style.transform = 'none';
+    }
+  });
+
+  const a=document.createElement('a');
+  const name=`camera_frame_${currentMode}_${currentSkin}.jpg`;
+  if(canvasCap.toBlob){
+    canvasCap.toBlob((blob)=>{
+      if(!blob) return;
+      const url=URL.createObjectURL(blob);
+      a.href=url; a.download=name;
+      document.body.appendChild(a); a.click();
+      setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 0);
+    }, 'image/jpeg', 0.95);
+  }else{
+    a.href=canvasCap.toDataURL('image/jpeg', 0.95);
+    a.download=name;
+    document.body.appendChild(a); a.click(); a.remove();
+  }
+});
+
+/* 초기 썸네일 카운트 렌더 */
+updateThumbs();
+
+
+ function setStageGap() {
+    const stageOuter = document.querySelector('.stage-outer');
+    const stageEl = document.getElementById('stage');
+    if (!stageOuter || !stageEl) return;
+    // 왼쪽 칼럼(width) - 실제 스테이지(width)의 좌/우 남는 여백 절반 = 오른쪽 기준 오프셋
+    const gap = Math.max(0, (stageOuter.clientWidth - stageEl.clientWidth) / 2);
+    stageOuter.style.setProperty('--stage-gap', `${gap}px`);
+  }
+
+  // 최초/리사이즈/스테이지 크기 변화 모두 대응
+  window.addEventListener('resize', setStageGap);
+  new ResizeObserver(setStageGap).observe(document.getElementById('stage'));
+
+  // DOM 준비 후 및 폰트 워밍, 모드 전환 등 레이아웃 변동 시에도 호출
+  document.addEventListener('DOMContentLoaded', setStageGap);
+
+  // 이미 있는 콜백들 뒤에 살짝 추가해도 OK
+  const _openResultOverlay = openResultOverlay;
+  openResultOverlay = function(){ _openResultOverlay(); setStageGap(); };
+  const _setMode = setMode;
+  setMode = function(mode){ _setMode(mode); setStageGap(); };
+
+
+function fitFrameToViewport(){
+  if(!overlay || overlay.style.display!=='block') return;
+
+  const wrap = document.querySelector('.rs-wrap');
+  if(!wrap) return;
+
+  // 래퍼 실제 패딩을 고려해서 가용 영역 계산
+  const cs = getComputedStyle(wrap);
+  const padX = (parseFloat(cs.paddingLeft)||0) + (parseFloat(cs.paddingRight)||0);
+  const padY = (parseFloat(cs.paddingTop)||0) + (parseFloat(cs.paddingBottom)||0);
+
+  const availW = wrap.clientWidth  - padX;
+  const availH = wrap.clientHeight - padY;
+
+  // 프레임의 "자연 크기"(fixed 규격) 측정
+  // transform 영향 제거 위해 잠시 무효화
+  const prev = frameBox.style.transform;
+  frameBox.style.transform = 'none';
+  const fw = frameBox.offsetWidth;
+  const fh = frameBox.offsetHeight;
+  frameBox.style.transform = prev;
+
+  if(fw === 0 || fh === 0) return;
+
+  // 프레임 전체를 통째로 스케일
+  const scale = Math.max(0.1, Math.min(availW / fw, availH / fh));
+  frameBox.style.setProperty('--frame-scale', String(scale));
+}
+
+// 리사이즈/오버레이 열기/모드 변경 시마다 호출
+window.addEventListener('resize', fitFrameToViewport);
+
+// 이미 있는 openResultOverlay / setMode 래핑에 fitFrameToViewport도 추가
+const __openResultOverlay = openResultOverlay;
+openResultOverlay = function(){
+  __openResultOverlay();
+  requestAnimationFrame(()=>{ fitFrameToViewport(); });
+};
+
+const __setMode = setMode;
+setMode = function(mode){
+  __setMode(mode);
+  requestAnimationFrame(()=>{ fitFrameToViewport(); });
+};
+
+// 스킨 바꿔도 살짝 레이아웃 변하니까 한 번 더
+const _setFrameSkin = setFrameSkin;
+setFrameSkin = function(skin){
+  _setFrameSkin(skin);
+  requestAnimationFrame(()=>{ fitFrameToViewport(); });
+};
+
+// 혹시 폰트/이미지 로딩으로 크기 변하면 관찰해서 재계산
+new ResizeObserver(()=>fitFrameToViewport()).observe(document.getElementById('frameBox'));
+
+
+
+
+
+  </script>
+<div id="photo-modal" class="modal hidden">
+  <span class="close-btn" id="close-btn">×</span>
+  <img id="modal-image" src="" alt="modal">
+  <div class="modal-title" id="modal-title"></div>
+  <div class="modal-desc" id="modal-desc"></div>
+  <div class="nav">
+    <button id="prev" class="arrow-btn">
+  <svg class="arrow-icon" viewBox="0 0 30 24">
+    <line x1="24" y1="12" x2="4" y2="12" />
+    <polyline points="10 6 4 12 10 18" />
+  </svg>
+</button>
+
+    <button id="next" class="arrow-btn">
+  <svg class="arrow-icon" viewBox="0 0 30 24">
+    <line x1="6" y1="12" x2="26" y2="12" />
+    <polyline points="20 6 26 12 20 18" />
+  </svg>
+</button>
+
+  </div>
+</div>
+
+<div id="video-modal" class="video-modal" aria-hidden="true">
+  <button class="vm-close" aria-label="Close">×</button>
+  <div class="vm-content">
+    <video id="vm-player" controls playsinline></video>
+  </div>
+
+  <!-- 🔽 양쪽 화살표는 모달 내부에! -->
+  <div class="nav">
+    <button id="vm-prev" class="arrow-btn">
+      <svg class="arrow-icon" viewBox="0 0 30 24">
+        <line x1="24" y1="12" x2="4" y2="12" />
+        <polyline points="10 6 4 12 10 18" />
+      </svg>
+    </button>
+
+    <button id="vm-next" class="arrow-btn">
+      <svg class="arrow-icon" viewBox="0 0 30 24">
+        <line x1="6" y1="12" x2="26" y2="12" />
+        <polyline points="20 6 26 12 20 18" />
+      </svg>
+    </button>
+  </div>
+</div>
+
+
+
+
+</body>
+</html>
